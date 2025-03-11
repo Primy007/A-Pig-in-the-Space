@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://de8k2j2ebr1te"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_xko3q"]
+[ext_resource type="Texture2D" uid="uid://c873wwgs7trff" path="res://assets/images/player/NAVICELLA PORCA.png" id="2_fxan6"]
+[ext_resource type="PackedScene" uid="uid://cdwbpvdxeh7pt" path="res://scenes/bullet.tscn" id="2_kv8da"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5qhnl"]
+radius = 39.0
+height = 86.0
+
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_marker")]
+position = Vector2(674, 437)
+script = ExtResource("1_xko3q")
+bullet_scene = ExtResource("2_kv8da")
+muzzle_marker = NodePath("Marker2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_fxan6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_5qhnl")
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(0, -57)
