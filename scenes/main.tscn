@@ -36,7 +36,82 @@ motion_mirroring = Vector2(4090, 4090)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
 texture = ExtResource("3_ybehj")
 
-[node name="Player" parent="." groups=["player"] instance=ExtResource("5_ul1qq")]
-position = Vector2(799, 481)
+[node name="Player" parent="." instance=ExtResource("5_ul1qq")]
+position = Vector2(800, 481)
 
 [node name="Enemy_Fly" parent="." instance=ExtResource("5_mw37l")]
+
+[node name="Enemy_Fly2" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-1087.42, 649.712)
+
+[node name="Enemy_Fly3" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(3667.99, 257.011)
+
+[node name="Enemy_Fly4" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-874.586, 3402.19)
+
+[node name="Enemy_Fly5" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(5294.35, 2005.42)
+
+[node name="Enemy_Fly6" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(4638.35, -1098.58)
+
+[node name="Enemy_Fly7" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-4865.65, -2122.58)
+
+[node name="Enemy_Fly8" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-5169.65, 3237.42)
+
+[node name="Enemy_Fly9" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(9710.35, 2517.42)
+
+[node name="Enemy_Fly10" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(4686.35, 5157.42)
+
+[node name="Enemy_Fly11" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-689.648, -2490.58)
+
+[node name="Enemy_Fly12" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(5203.09, -8206.67)
+
+[node name="Enemy_Fly13" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-9938.93, 7996.25)
+
+[node name="Enemy_Fly14" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(9304.62, -2973.03)
+
+[node name="Enemy_Fly15" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-3109.21, -5540.37)
+
+[node name="Enemy_Fly16" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-11505.9, -466.099)
+
+[node name="Enemy_Fly17" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(4381.37, 7477.55)
+
+[node name="Enemy_Fly18" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(12868.7, 5816.33)
+
+[node name="Enemy_Fly19" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(14529.9, -1160.79)
+
+[node name="Enemy_Fly20" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(1874.44, -3607.31)
+
+[node name="Enemy_Fly21" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(1632.81, 3581.23)
+
+[node name="Enemy_Fly22" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(2332.84, -1528.8)
+
+[node name="Enemy_Fly23" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(3732.09, 3045.68)
+
+[node name="Enemy_Fly24" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(1767.76, 5386.73)
+
+[node name="Enemy_Fly25" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-2968.17, 1754.06)
+
+[node name="Enemy_Fly26" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(1448.81, 2708.94)

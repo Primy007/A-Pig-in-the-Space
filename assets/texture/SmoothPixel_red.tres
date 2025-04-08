@@ -1,0 +1,6 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b7u8g6ddusmsl"]
+
+[ext_resource type="Shader" path="res://assets/texture/SmoothPixel_rosso.gdshader" id="1_ehwwq"]
+
+[resource]
+shader = ExtResource("1_ehwwq")

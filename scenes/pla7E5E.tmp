@@ -121,12 +121,11 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_marker") groups=["player"]]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_marker")]
 position = Vector2(674, 437)
 script = ExtResource("1_xko3q")
 bullet_scene = ExtResource("2_kv8da")
 muzzle_marker = NodePath("Marker2D")
-camera_smooth_speed = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_5qhnl")

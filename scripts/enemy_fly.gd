@@ -1,57 +1,77 @@
 extends CharacterBody2D
 
-@export var speed: float = 200  # Velocità di movimento
-@export var stop_distance: float = 600  # Distanza minima dal player prima di fermarsi
-@export var fire_rate: float = 1.0  # Tempo in secondi tra ogni sparo
+# --- Configurazione esposta ---
+@export var speed: float = 200
+@export var stop_distance_x: float = 800  # Distanza orizzontale per fermarsi
+@export var stop_distance_y: float = 500  # Distanza verticale per fermarsi
+@export var flee_distance: float = 300    # Distanza euclidea per iniziare a fuggire
+@export var flee_speed: float = 150
+@export var fire_rate: float = 1.0
+@export var bullet_scene: PackedScene
+@export var muzzle_markers: Array[Marker2D] = []
 
+# --- Riferimenti ai nodi ---
 @onready var animation_flying = $Enemy_flying
-
-var player  # Riferimento al player
-var time_since_last_shot: float = 0  # Variabile per il timer tra gli spari
-
-@export var bullet_scene: PackedScene  # Assegna la scena del proiettile nell'editor
-
-@export var muzzle_marker: Marker2D  # Primo marker di sparo
-@export var muzzle_marker2: Marker2D  # Secondo marker di sparo
-
-var bullet = preload("res://scenes/EnemyBullet.tscn")
+@onready var attack_cooldown = $AttackCooldown
+@onready var player = get_tree().get_first_node_in_group("player")
 
 func _ready():
 	animation_flying.play("Normal")
-	player = get_tree().get_first_node_in_group("player")  # Trova il player nel gruppo
-	if player == null:
-		queue_free()  # Se il player non esiste, elimina il nemico
+	_validate_setup()
 
 func _physics_process(delta):
-	if player:
-		var direction = (player.global_position - global_position).normalized()
-		var distance = global_position.distance_to(player.global_position)
+	if !is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player")
+		return
+	
+	_handle_movement()
+	_rotate_towards_player()
+	
+	if _in_attack_range() && attack_cooldown.is_stopped():
+		_shoot()
+		attack_cooldown.start(fire_rate)
 
-		# Ruota il nemico verso il player
-		rotation = direction.angle() + PI / 2  # + PI/2 se l'immagine è orientata in alto
+# --- Metodi privati ---
+func _validate_setup():
+	if !player:
+		printerr("Player non trovato nel gruppo 'player'!")
+		queue_free()
+	if muzzle_markers.is_empty():
+		printerr("Nessun muzzle marker assegnato!")
+	if !bullet_scene:
+		printerr("Nessuna scena proiettile assegnata!")
 
-		if distance > stop_distance:  # Si muove solo se è più lontano della stop_distance
-			velocity = direction * speed
-			move_and_slide()
-		else:
-			velocity = Vector2.ZERO  # Si ferma
-			time_since_last_shot += delta  # Incrementa il timer per sparare
-			# Se il timer è maggiore o uguale al fire_rate, spariamo
-			if time_since_last_shot >= fire_rate:
-				shoot()
-				time_since_last_shot = 0  # Reset del timer
+func _handle_movement():
+	var player_pos = player.global_position
+	var direction = (player_pos - global_position).normalized()
+	var distance = global_position.distance_to(player_pos)
+	
+	if distance < flee_distance:
+		velocity = -direction * flee_speed
+	elif _should_approach():
+		velocity = direction * speed
+	else:
+		velocity = Vector2.ZERO
+	
+	move_and_slide()
 
-# Funzione per sparare da entrambi i marker
-func shoot():
-	if bullet_scene and muzzle_marker and muzzle_marker2:
-		# Crea il proiettile dal primo marker (Marker)
-		var bullet1 = bullet_scene.instantiate()
-		bullet1.global_position = muzzle_marker.global_position
-		bullet1.direction = -muzzle_marker.global_transform.y
-		get_tree().current_scene.add_child(bullet1)
+func _should_approach() -> bool:
+	var player_pos = player.global_position
+	return (abs(player_pos.x - global_position.x) > stop_distance_x || 
+		   abs(player_pos.y - global_position.y) > stop_distance_y)
 
-		# Crea il proiettile dal secondo marker (Marker2)
-		var bullet2 = bullet_scene.instantiate()
-		bullet2.global_position = muzzle_marker2.global_position
-		bullet2.direction = -muzzle_marker2.global_transform.y
-		get_tree().current_scene.add_child(bullet2)
+func _rotate_towards_player():
+	var direction = (player.global_position - global_position).normalized()
+	rotation = direction.angle() + PI/2
+
+func _in_attack_range() -> bool:
+	var player_pos = player.global_position
+	return (abs(player_pos.x - global_position.x) < stop_distance_x && 
+		   abs(player_pos.y - global_position.y) < stop_distance_y)
+
+func _shoot():
+	for marker in muzzle_markers:
+		var bullet = bullet_scene.instantiate()
+		bullet.global_position = marker.global_position
+		bullet.direction = -marker.global_transform.y.normalized()
+		get_parent().add_child(bullet)

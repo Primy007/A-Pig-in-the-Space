@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b6564exuvfcu"]
+
+[ext_resource type="Shader" path="res://assets/texture/SmoothPixel.gdshader" id="1_46wyh"]
+
+[resource]
+shader = ExtResource("1_46wyh")
+shader_parameter/hue_target = 0.95
+shader_parameter/saturation_power = 3.5
+shader_parameter/value_corruption = 0.7
+shader_parameter/blood_dominance = 0.98

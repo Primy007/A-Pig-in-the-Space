@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://h1x0iam24tu3"]
+[gd_scene load_steps=5 format=3 uid="uid://h1x0iam24tu3"]
 
 [ext_resource type="Script" path="res://scripts/asteroid.gd" id="1_moaon"]
 [ext_resource type="Texture2D" uid="uid://42d0qjmy638l" path="res://assets/images/asteroid/Layered Rock.png" id="2_00wo2"]
+[ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="2_s8nkq"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jigy1"]
 radius = 52.3259
@@ -13,7 +14,8 @@ script = ExtResource("1_moaon")
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture_filter = 1
+texture_filter = 2
+material = ExtResource("2_s8nkq")
 position = Vector2(3.57628e-06, 3.33786e-06)
 scale = Vector2(0.658333, 0.658333)
 texture = ExtResource("2_00wo2")

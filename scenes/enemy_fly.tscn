@@ -1,8 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://c41p18a6y8ymy"]
+[gd_scene load_steps=15 format=3 uid="uid://c41p18a6y8ymy"]
 
 [ext_resource type="Script" path="res://scripts/enemy_fly.gd" id="1_fpblk"]
 [ext_resource type="PackedScene" uid="uid://d0oyg527nsj0a" path="res://scenes/EnemyBullet.tscn" id="2_q1mlb"]
 [ext_resource type="Texture2D" uid="uid://pqvtkyldl27" path="res://assets/images/enemies/personalizzato/enemy.png" id="3_likil"]
+[ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="3_ovouv"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_svjiv"]
 atlas = ExtResource("3_likil")
@@ -72,14 +73,16 @@ animations = [{
 radius = 26.0
 height = 94.0
 
-[node name="Enemy_Fly" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_marker", "muzzle_marker2") groups=["enemies"]]
+[node name="Enemy_Fly" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_markers") groups=["enemies"]]
 position = Vector2(179, 232)
 script = ExtResource("1_fpblk")
 bullet_scene = ExtResource("2_q1mlb")
-muzzle_marker = NodePath("Marker")
-muzzle_marker2 = NodePath("Marker2")
+muzzle_markers = [NodePath("Marker"), NodePath("Marker2")]
 
 [node name="Enemy_flying" type="AnimatedSprite2D" parent="."]
+texture_filter = 2
+material = ExtResource("3_ovouv")
+position = Vector2(1, 6)
 sprite_frames = SubResource("SpriteFrames_p54o2")
 animation = &"Normal"
 
@@ -93,6 +96,7 @@ position = Vector2(-35, -44)
 [node name="Marker2" type="Marker2D" parent="."]
 position = Vector2(35, -44)
 
-[node name="Timer" type="Timer" parent="."]
+[node name="AttackCooldown" type="Timer" parent="."]
+one_shot = true
 
-[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="timeout" from="AttackCooldown" to="." method="_on_timer_timeout"]

@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://cdwbpvdxeh7pt"]
+[gd_scene load_steps=13 format=3 uid="uid://cdwbpvdxeh7pt"]
 
 [ext_resource type="Script" path="res://scripts/bullet.gd" id="1_j8bwm"]
 [ext_resource type="Texture2D" uid="uid://b8qgg2qb5s3qd" path="res://assets/images/player/laser_bullet.png" id="1_om0dx"]
 [ext_resource type="Texture2D" uid="uid://c4helvombsen" path="res://assets/images/player/laser_bullet_singolo.png" id="2_c77hs"]
+[ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="2_ofduq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_e2jc3"]
 radius = 6.0
@@ -76,11 +77,13 @@ position = Vector2(-4.1008e-05, -5.00679e-06)
 scale = Vector2(0.799998, 1.5)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture_filter = 1
+texture_filter = 2
+material = ExtResource("2_ofduq")
 texture = ExtResource("2_c77hs")
 
 [node name="Bullet_animation" type="AnimatedSprite2D" parent="."]
-texture_filter = 1
+texture_filter = 2
+material = ExtResource("2_ofduq")
 sprite_frames = SubResource("SpriteFrames_fqcw7")
 animation = &"Bullet_explosion"
 
