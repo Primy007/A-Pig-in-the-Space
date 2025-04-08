@@ -5,8 +5,10 @@ var velocity := Vector2.ZERO
 var rotation_speed := 0.0
 var speed := 0.0
 
-var min_speed = 400.0
-var max_speed = 600.0
+var min_speed = 300.0
+var max_speed = 500.0
+
+	
 
 var min_rotation = 0.01
 var max_rotation = 0.08

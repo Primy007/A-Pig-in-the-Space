@@ -1,19 +1,71 @@
-[gd_scene load_steps=4 format=3 uid="uid://cdwbpvdxeh7pt"]
+[gd_scene load_steps=12 format=3 uid="uid://cdwbpvdxeh7pt"]
 
 [ext_resource type="Script" path="res://scripts/bullet.gd" id="1_j8bwm"]
 [ext_resource type="Texture2D" uid="uid://b8qgg2qb5s3qd" path="res://assets/images/player/laser_bullet.png" id="1_om0dx"]
+[ext_resource type="Texture2D" uid="uid://c4helvombsen" path="res://assets/images/player/laser_bullet_singolo.png" id="2_c77hs"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_e2jc3"]
 radius = 6.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5wwq1"]
+atlas = ExtResource("1_om0dx")
+region = Rect2(116, 0, 58, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qd113"]
+atlas = ExtResource("1_om0dx")
+region = Rect2(174, 0, 58, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uvn01"]
+atlas = ExtResource("1_om0dx")
+region = Rect2(232, 0, 58, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vhiby"]
+atlas = ExtResource("1_om0dx")
+region = Rect2(290, 0, 58, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_24xm0"]
+atlas = ExtResource("1_om0dx")
+region = Rect2(0, 0, 58, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_taspq"]
+atlas = ExtResource("1_om0dx")
+region = Rect2(58, 0, 58, 36)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fqcw7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5wwq1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qd113")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uvn01")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vhiby")
+}],
+"loop": false,
+"name": &"Bullet_explosion",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_24xm0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_taspq")
+}],
+"loop": true,
+"name": &"Bullet_shoot",
+"speed": 7.0
+}]
 
 [node name="Bullet" type="Area2D"]
 position = Vector2(783, 472)
 script = ExtResource("1_j8bwm")
 metadata/_edit_group_ = true
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture_filter = 1
-texture = ExtResource("1_om0dx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -6)
@@ -23,4 +75,14 @@ shape = SubResource("CircleShape2D_e2jc3")
 position = Vector2(-4.1008e-05, -5.00679e-06)
 scale = Vector2(0.799998, 1.5)
 
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_c77hs")
+
+[node name="Bullet_animation" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_fqcw7")
+animation = &"Bullet_explosion"
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

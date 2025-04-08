@@ -1,44 +1,88 @@
-extends CharacterBody2D # definisce che lo script è associato a un nodo di tipo CharacterBody2D. Questo ti permette di usare tutte le funzionalità di CharacterBody2D, come move_and_slide(), velocity, e i metodi per rilevare collisioni.
+extends CharacterBody2D
 
-@onready var spawn_point = get_node("SpawnPoint")
+var speed = 500                   # Velocità della navicella
+var acceleration = 700            # Accelerazione della navicella
+var friction = 600                # Frizione per fermarsi
+var rotation_speed = 3            # Velocità di rotazione
 
-var speed = 500 #determina la velocita della navicella
-var acceleration = 700 #determina l'accelerazione della navicella
-var friction = 600 #determina la frizione della navicella (lo spazio necessario per fermarsi)
-var rotation_speed = 3 #determina con che velocità la navicella si ruota nella direzione di input
-
-@export var bullet_scene: PackedScene  # Assegna la scena del proiettile nell'editor
+@export var bullet_scene: PackedScene    # Scena del proiettile da assegnare nell'editor
 var can_shoot = true
-var fire_rate = 0.2  # Secondi tra uno sparo e l'altro
+var fire_rate = 0.2                      # Tempo fra uno sparo e l'altro (in secondi)
 
-func _physics_process(delta): #funzione che fa in modo che le seguenti azioni vengano svolte per ogni frame del gioco
-	var input_vector = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") #la variabile riceve l'input sopra,sotto... e ne crea un vettore
-	
-	if input_vector != Vector2.ZERO: #controlla che l'utente clicchi un pulsante che modifichi le cordinate del vettore e che quindi non siano (0,0) o .ZERO
-		
-		var target_angle = input_vector.angle() + PI/2  #la variabile prende il valore dell'input in vettore come angolo in radiante che parte da 0 verso destra (asse delle ascisse positivo). +PI/2 per correggere l'orientamento dato che la mia immaggine è verso l'alto
-		
-		# Rotazione graduale
-		rotation = lerp_angle(rotation, target_angle, rotation_speed * delta) #lerp_angle interpola (muove gradualemente rotation (la rotazione alla quale si trova nel momento la navicella) per arrivare all'input di angolo cioè target_angle ad una velocita pari a rotation_speed * delta (cioè rotation_speed * tempo trascorso dall'ultimo frame)(delta è utilizzato per rendere la velocità indipendente dal frame rate)
-		
-		# Movimento con inerzia
-		velocity = velocity.move_toward(input_vector.normalized() * speed, acceleration * delta) #velocity.move_toward Sposta gradualmente il vettore velocity verso il vettore target (in questo caso, input_vector.normalized() * speed) che quindi rapressenta il limite di velocità da raggiungere e lo fa ad un passo pari ad acceleration * delta
+@onready var animation_flying = $Flyng_Sprite
+@onready var animation_fire = $Fire_Sprite
+@onready var sprite_shoot = $Shoot_effect
+
+enum FireState { OFF, SPARK, FIRE_LOOP, STOP }
+var fire_state = FireState.OFF
+
+func _ready():
+	$Fire_Sprite.visible = false
+	$Shoot_effect.visible = false
+
+# Funzione helper per verificare se il player sta muovendo
+func is_moving() -> bool:
+	return Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") != Vector2.ZERO
+
+# Funzione dedicata all'aggiornamento dell'animazione del fuoco
+func update_fire_animation():
+	if is_moving():
+		if fire_state == FireState.OFF or fire_state == FireState.STOP:
+			$Fire_Sprite.visible = true
+			animation_fire.play("spark")
+			fire_state = FireState.SPARK
 	else:
-		velocity = velocity.move_toward(Vector2.ZERO, friction * delta) #questa volta velocity.move_toward Sposta gradualmente il vettore velocity verso il fermarsi (Vector2.ZERO) ad una velocità pari a friction * delta
+		if (fire_state == FireState.SPARK or fire_state == FireState.FIRE_LOOP) and animation_fire.animation != "fire_stop":
+			animation_fire.play("fire_stop")
+			fire_state = FireState.STOP
+
+func _physics_process(delta):
+	var input_vector = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	
-	move_and_slide() #funzione base di godot per gestire movimenti e collisioni come velocity
+	if is_moving():
+		# Calcola l'angolo target e ruota gradualmente la navicella
+		var target_angle = input_vector.angle() + PI/2
+		rotation = lerp_angle(rotation, target_angle, rotation_speed * delta)
+		velocity = velocity.move_toward(input_vector.normalized() * speed, acceleration * delta)
+		animation_flying.play("Flying")
+	else:
+		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+		animation_flying.stop()
+	
+	update_fire_animation()
+	move_and_slide()
 	
 	if Input.is_action_pressed("fire") and can_shoot:
 		shoot()
 		can_shoot = false
 		await get_tree().create_timer(fire_rate).timeout
 		can_shoot = true
-		
+
 @export var muzzle_marker: Marker2D
 
 func shoot():
-	if bullet_scene && muzzle_marker:
+	if bullet_scene and muzzle_marker:
+		# Instanzia e posiziona il proiettile
 		var bullet = bullet_scene.instantiate()
 		bullet.global_position = muzzle_marker.global_position
 		bullet.direction = -muzzle_marker.global_transform.y
 		get_tree().current_scene.add_child(bullet)
+		
+		# Attiva lo sprite dell'effetto sparo per 0.2 secondi (o il tempo desiderato)
+		sprite_shoot.visible = true
+		await get_tree().create_timer(0.16).timeout  # Puoi modificare 0.2 con il tempo che preferisci
+		sprite_shoot.visible = false
+
+# Callback per il segnale "animation_finished" senza parametri
+func _on_fire_sprite_animation_finished():
+	match animation_fire.animation:
+		"spark":
+			if is_moving():
+				animation_fire.play("fire_loop")
+				fire_state = FireState.FIRE_LOOP
+			else:
+				animation_fire.play("fire_stop")
+				fire_state = FireState.STOP
+		"fire_stop":
+			$Fire_Sprite.visible = false
+			fire_state = FireState.OFF
