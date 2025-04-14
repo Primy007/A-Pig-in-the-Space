@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cdwbpvdxeh7pt"]
+[gd_scene load_steps=13 format=3 uid="uid://dulrlilmvws6"]
 
 [ext_resource type="Script" path="res://scripts/bullet.gd" id="1_j8bwm"]
 [ext_resource type="Texture2D" uid="uid://b8qgg2qb5s3qd" path="res://assets/images/player/laser_bullet.png" id="1_om0dx"]

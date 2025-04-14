@@ -10,6 +10,7 @@ func _ready():
 	rotation = direction.angle() + PI/2  # Aggiusta in base all'orientamento iniziale
 	$Bullet_animation.visible = false
 
+
 func _physics_process(delta):
 	position += direction * speed * delta
 

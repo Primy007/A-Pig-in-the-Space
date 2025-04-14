@@ -1,0 +1,114 @@
+[gd_scene load_steps=6 format=3 uid="uid://qtdmhsmcvco3"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_aockw"]
+[ext_resource type="Texture2D" uid="uid://c4dp5lkk1m4x8" path="res://assets/images/background/Scene-2.jpg" id="1_og1wn"]
+[ext_resource type="PackedScene" uid="uid://cu6gy4s4xhu7e" path="res://scenes/options_menu.tscn" id="3_36bf0"]
+
+[sub_resource type="SystemFont" id="SystemFont_ofqfy"]
+font_names = PackedStringArray("Californian FB")
+
+[sub_resource type="SystemFont" id="SystemFont_btxtn"]
+font_names = PackedStringArray("Agency FB")
+
+[node name="Main_Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_aockw")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -406.0
+offset_top = -228.0
+offset_right = 406.0
+offset_bottom = 228.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_og1wn")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 170
+
+[node name="Seperator" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = SubResource("SystemFont_ofqfy")
+theme_override_font_sizes/font_size = 120
+text = "Zoolaxy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="Seperator" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Seperator2" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Seperator3" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Seperator5" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Seperator6" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Seperator4" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Play_Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_btxtn")
+theme_override_font_sizes/font_size = 40
+text = "PLAY"
+
+[node name="Options_Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_btxtn")
+theme_override_font_sizes/font_size = 40
+text = "OPTIONS"
+
+[node name="Exit_Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_btxtn")
+theme_override_font_sizes/font_size = 40
+text = "EXIT"
+
+[node name="Options_menu" parent="." instance=ExtResource("3_36bf0")]
+visible = false
+layout_mode = 1

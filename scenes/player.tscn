@@ -1,8 +1,8 @@
-[gd_scene load_steps=22 format=3 uid="uid://de8k2j2ebr1te"]
+[gd_scene load_steps=22 format=3 uid="uid://v3hdef2mwb1l"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_xko3q"]
 [ext_resource type="Texture2D" uid="uid://c873wwgs7trff" path="res://assets/images/player/NAVICELLA PORCA.png" id="2_fxan6"]
-[ext_resource type="PackedScene" uid="uid://cdwbpvdxeh7pt" path="res://scenes/bullet.tscn" id="2_kv8da"]
+[ext_resource type="PackedScene" uid="uid://dulrlilmvws6" path="res://scenes/bullet.tscn" id="2_kv8da"]
 [ext_resource type="Texture2D" uid="uid://vyqttoc3i2px" path="res://assets/images/player/Fiamma.png" id="4_vr4ay"]
 [ext_resource type="Texture2D" uid="uid://dtk03rpkp2ttj" path="res://assets/images/player/Effetto_sparo.png" id="5_qajxv"]
 [ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="5_ra17r"]

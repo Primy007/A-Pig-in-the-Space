@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://h1x0iam24tu3"]
+[gd_scene load_steps=5 format=3 uid="uid://peodo11jl1nh"]
 
 [ext_resource type="Script" path="res://scripts/asteroid.gd" id="1_moaon"]
 [ext_resource type="Texture2D" uid="uid://42d0qjmy638l" path="res://assets/images/asteroid/Layered Rock.png" id="2_00wo2"]

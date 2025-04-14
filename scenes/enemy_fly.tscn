@@ -1,7 +1,7 @@
-[gd_scene load_steps=15 format=3 uid="uid://c41p18a6y8ymy"]
+[gd_scene load_steps=15 format=3 uid="uid://jo02i8tp7axw"]
 
 [ext_resource type="Script" path="res://scripts/enemy_fly.gd" id="1_fpblk"]
-[ext_resource type="PackedScene" uid="uid://d0oyg527nsj0a" path="res://scenes/EnemyBullet.tscn" id="2_q1mlb"]
+[ext_resource type="PackedScene" uid="uid://bxh4w6sm1iol5" path="res://scenes/EnemyBullet.tscn" id="2_q1mlb"]
 [ext_resource type="Texture2D" uid="uid://pqvtkyldl27" path="res://assets/images/enemies/personalizzato/enemy.png" id="3_likil"]
 [ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="3_ovouv"]
 

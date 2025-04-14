@@ -1,10 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://ckychj051flfh"]
+[gd_scene load_steps=7 format=3 uid="uid://bvuge3ghg5v4"]
 
-[ext_resource type="PackedScene" uid="uid://h1x0iam24tu3" path="res://scenes/asteroid.tscn" id="1_15ar3"]
+[ext_resource type="PackedScene" uid="uid://peodo11jl1nh" path="res://scenes/asteroid.tscn" id="1_15ar3"]
 [ext_resource type="Script" path="res://scripts/parallax_background.gd" id="2_y25m8"]
 [ext_resource type="Texture2D" uid="uid://bwgq04d5523lr" path="res://assets/images/background/EmptyStarfield.jpg" id="3_ybehj"]
-[ext_resource type="PackedScene" uid="uid://c41p18a6y8ymy" path="res://scenes/enemy_fly.tscn" id="5_mw37l"]
-[ext_resource type="PackedScene" uid="uid://de8k2j2ebr1te" path="res://scenes/player.tscn" id="5_ul1qq"]
+[ext_resource type="PackedScene" uid="uid://jo02i8tp7axw" path="res://scenes/enemy_fly.tscn" id="5_mw37l"]
+[ext_resource type="PackedScene" uid="uid://v3hdef2mwb1l" path="res://scenes/player.tscn" id="5_ul1qq"]
 
 [sub_resource type="GDScript" id="GDScript_ce4gr"]
 script/source = "extends Node

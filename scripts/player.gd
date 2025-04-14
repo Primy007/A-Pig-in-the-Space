@@ -37,7 +37,7 @@ func _ready():
 	_reset_visuals()
 
 func _physics_process(delta):
-	var input_vector = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
 	_handle_movement(input_vector, delta)
 	_update_fire_animation(input_vector)
@@ -132,7 +132,7 @@ func apply_screen_shake(strength: float, duration: float):
 
 # --- SIGNAL HANDLERS ---
 func _on_fire_sprite_animation_finished():
-	var current_input = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var current_input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
 	match fire_state:
 		FireState.SPARK:
