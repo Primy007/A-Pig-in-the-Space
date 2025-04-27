@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://qtdmhsmcvco3"]
+[gd_scene load_steps=7 format=3 uid="uid://qtdmhsmcvco3"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_aockw"]
 [ext_resource type="Texture2D" uid="uid://c4dp5lkk1m4x8" path="res://assets/images/background/Scene-2.jpg" id="1_og1wn"]
 [ext_resource type="PackedScene" uid="uid://cu6gy4s4xhu7e" path="res://scenes/options_menu.tscn" id="3_36bf0"]
+[ext_resource type="AudioStream" uid="uid://dst0ksi37edab" path="res://assets/audio/Brylie Christopher Oxley - Melancholy Aurora.mp3" id="4_nvqqr"]
 
 [sub_resource type="SystemFont" id="SystemFont_ofqfy"]
 font_names = PackedStringArray("Californian FB")
@@ -24,13 +25,14 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -406.0
-offset_top = -228.0
-offset_right = 406.0
-offset_bottom = 228.0
+offset_left = -19.0
+offset_top = -15.0
+offset_right = 19.0
+offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_og1wn")
+expand_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -112,3 +114,9 @@ text = "EXIT"
 [node name="Options_menu" parent="." instance=ExtResource("3_36bf0")]
 visible = false
 layout_mode = 1
+
+[node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_nvqqr")
+volume_db = -11.709
+autoplay = true
+bus = &"Music"
