@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://v3hdef2mwb1l"]
+[gd_scene load_steps=24 format=3 uid="uid://v3hdef2mwb1l"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_xko3q"]
 [ext_resource type="Texture2D" uid="uid://c873wwgs7trff" path="res://assets/images/player/NAVICELLA PORCA.png" id="2_fxan6"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://vyqttoc3i2px" path="res://assets/images/player/Fiamma.png" id="4_vr4ay"]
 [ext_resource type="Texture2D" uid="uid://dtk03rpkp2ttj" path="res://assets/images/player/Effetto_sparo.png" id="5_qajxv"]
 [ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="5_ra17r"]
+[ext_resource type="AudioStream" uid="uid://bs70vrblqtwno" path="res://assets/audio/sfx/spark/11L-generate_me_the_soun-1745792399464.mp3" id="7_ojqlg"]
+[ext_resource type="AudioStream" uid="uid://byxls3mv3nvmp" path="res://assets/audio/sfx/rocket_loop_ai.mp3" id="8_5j5lb"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5qhnl"]
 radius = 39.0
@@ -146,9 +148,7 @@ texture_filter = 2
 material = ExtResource("5_ra17r")
 position = Vector2(0.5, 67)
 sprite_frames = SubResource("SpriteFrames_b0pl1")
-animation = &"fire_loop"
-frame = 3
-frame_progress = 0.76267
+animation = &"fire_stop"
 
 [node name="Shoot_effect" type="Sprite2D" parent="."]
 texture_filter = 2
@@ -163,5 +163,12 @@ remote_path = NodePath("../Camera2D")
 process_callback = 0
 position_smoothing_enabled = true
 position_smoothing_speed = 2.0
+
+[node name="SparkSFX" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_ojqlg")
+bus = &"sfx"
+
+[node name="FireLoopSFX" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("8_5j5lb")
 
 [connection signal="animation_finished" from="Fire_Sprite" to="." method="_on_fire_sprite_animation_finished"]

@@ -1,5 +1,8 @@
 extends CharacterBody2D
 
+var is_dying: bool = false
+
+
 # --- Configurazione esposta ---
 @export var speed: float = 200
 @export var stop_distance_x: float = 800  # Distanza orizzontale per fermarsi
@@ -9,17 +12,29 @@ extends CharacterBody2D
 @export var fire_rate: float = 1.0
 @export var bullet_scene: PackedScene
 @export var muzzle_markers: Array[Marker2D] = []
+@export var max_health = 100
+@export var current_health = 100
 
 # --- Riferimenti ai nodi ---
 @onready var animation_flying = $Enemy_flying
 @onready var attack_cooldown = $AttackCooldown
 @onready var player = get_tree().get_first_node_in_group("player")
+@onready var health_bar = $HealthBar
 
 func _ready():
 	animation_flying.play("Normal")
 	_validate_setup()
+	update_health_bar()
+
+func _process(delta):
+	var offset = Vector2(-55, -80)  # regola Y a piacere
+	# sposto la barra in coordinate globali
+	health_bar.global_position = global_position + offset
 
 func _physics_process(delta):
+	if is_dying:
+		return
+		
 	if !is_instance_valid(player):
 		player = get_tree().get_first_node_in_group("player")
 		return
@@ -75,3 +90,37 @@ func _shoot():
 		bullet.global_position = marker.global_position
 		bullet.direction = -marker.global_transform.y.normalized()
 		get_parent().add_child(bullet)
+
+func take_damage(damage):
+	current_health -= damage
+	current_health = clamp(current_health, 0, max_health)
+	update_health_bar()
+
+	if current_health <= 0 and not is_dying:
+		is_dying = true
+		_handle_dead()
+
+func _handle_dead():
+	attack_cooldown.stop()                   # se vuoi fermare il timer
+	# (facoltativo) rimuovi il nemico dal gruppo “enemies”:
+	remove_from_group("enemies")
+	 # Az zero tutti i layer di collisione del CharacterBody2D
+	collision_layer = 0
+	collision_mask = 0
+	
+	health_bar.visible = false
+	
+	# suono di morte
+	$DeathSFX.play()
+	
+	#fa partire l'animazione
+	animation_flying.play("Explosion")
+	await animation_flying.animation_finished
+	#lo elimina
+	die()
+
+func update_health_bar():
+	health_bar.value = current_health
+
+func die():
+	queue_free()  # O animazione di morte, esplosione, ecc.

@@ -83,6 +83,7 @@ func _handle_moving_animation():
 	if fire_state in [FireState.OFF, FireState.STOP]:
 		$Fire_Sprite.visible = true
 		animation_fire.play("spark")
+		$SparkSFX.play()
 		fire_state = FireState.SPARK
 
 func _handle_stopping_animation():
