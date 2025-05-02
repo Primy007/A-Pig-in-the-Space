@@ -1,9 +1,34 @@
-[gd_scene load_steps=15 format=3 uid="uid://jo02i8tp7axw"]
+[gd_scene load_steps=22 format=3 uid="uid://jo02i8tp7axw"]
 
 [ext_resource type="Script" path="res://scripts/enemy_fly.gd" id="1_fpblk"]
 [ext_resource type="PackedScene" uid="uid://bxh4w6sm1iol5" path="res://scenes/EnemyBullet.tscn" id="2_q1mlb"]
 [ext_resource type="Texture2D" uid="uid://pqvtkyldl27" path="res://assets/images/enemies/personalizzato/enemy.png" id="3_likil"]
 [ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="3_ovouv"]
+[ext_resource type="Texture2D" uid="uid://jgbgt0y56yg0" path="res://assets/images/enemies/personalizzato/enemy_explosion.png" id="4_nc4si"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rjq6y"]
+atlas = ExtResource("4_nc4si")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hrr2l"]
+atlas = ExtResource("4_nc4si")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qsfr1"]
+atlas = ExtResource("4_nc4si")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vmp24"]
+atlas = ExtResource("4_nc4si")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q68g4"]
+atlas = ExtResource("4_nc4si")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_et4yi"]
+atlas = ExtResource("4_nc4si")
+region = Rect2(640, 0, 128, 128)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_svjiv"]
 atlas = ExtResource("3_likil")
@@ -39,6 +64,29 @@ region = Rect2(896, 0, 128, 128)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_p54o2"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rjq6y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hrr2l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qsfr1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vmp24")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q68g4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_et4yi")
+}],
+"loop": true,
+"name": &"Explosion",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_svjiv")
@@ -84,7 +132,9 @@ texture_filter = 2
 material = ExtResource("3_ovouv")
 position = Vector2(1, 6)
 sprite_frames = SubResource("SpriteFrames_p54o2")
-animation = &"Normal"
+animation = &"Explosion"
+frame = 2
+frame_progress = 0.636111
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -2)

@@ -63,7 +63,7 @@ animations = [{
 "speed": 7.0
 }]
 
-[node name="Bullet" type="Area2D"]
+[node name="Bullet" type="Area2D" groups=["bullet"]]
 position = Vector2(783, 472)
 script = ExtResource("1_j8bwm")
 metadata/_edit_group_ = true
