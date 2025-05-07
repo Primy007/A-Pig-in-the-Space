@@ -1,0 +1,81 @@
+[gd_scene load_steps=6 format=3 uid="uid://decgqip5dj2nh"]
+
+[ext_resource type="Texture2D" uid="uid://6ct0doxysw24" path="res://assets/images/HUD/text_bar.png" id="1_mfgra"]
+[ext_resource type="Script" path="res://scripts/textbox.gd" id="1_na3sy"]
+[ext_resource type="FontFile" uid="uid://dfud0wap3ihr8" path="res://assets/fonts/BPdots/BPdotsSquareBold.otf" id="2_77ubd"]
+[ext_resource type="Texture2D" uid="uid://udr2ynxlr3hy" path="res://assets/images/HUD/boar.png" id="4_kon6v"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rk4tb"]
+texture = ExtResource("1_mfgra")
+
+[node name="Textbox" type="CanvasLayer"]
+script = ExtResource("1_na3sy")
+
+[node name="TextboxContainer" type="MarginContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -686.0
+offset_top = -335.0
+offset_right = 686.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Panel" type="Panel" parent="TextboxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_rk4tb")
+
+[node name="MarginContainer" type="MarginContainer" parent="TextboxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 502
+theme_override_constants/margin_top = 113
+theme_override_constants/margin_right = 502
+theme_override_constants/margin_bottom = 68
+
+[node name="Panel" type="Panel" parent="TextboxContainer/MarginContainer"]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TextboxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Start" type="Label" parent="TextboxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 17
+text = "*"
+
+[node name="Label" type="Label" parent="TextboxContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(338, 130)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_77ubd")
+theme_override_font_sizes/font_size = 17
+text = "Heyy i'm so fucking gay really really really gay, Oh.... I'm really gay fuck."
+vertical_alignment = 1
+autowrap_mode = 3
+clip_text = true
+
+[node name="End" type="Label" parent="TextboxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("2_77ubd")
+theme_override_font_sizes/font_size = 17
+text = "v"
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.05
+
+[node name="PlayerTexture" type="TextureRect" parent="."]
+offset_left = 1323.0
+offset_top = 813.0
+offset_right = 1539.0
+offset_bottom = 1029.0
+texture = ExtResource("4_kon6v")
