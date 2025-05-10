@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://decgqip5dj2nh"]
+[gd_scene load_steps=7 format=3 uid="uid://decgqip5dj2nh"]
 
 [ext_resource type="Texture2D" uid="uid://6ct0doxysw24" path="res://assets/images/HUD/text_bar.png" id="1_mfgra"]
 [ext_resource type="Script" path="res://scripts/textbox.gd" id="1_na3sy"]
 [ext_resource type="FontFile" uid="uid://dfud0wap3ihr8" path="res://assets/fonts/BPdots/BPdotsSquareBold.otf" id="2_77ubd"]
 [ext_resource type="Texture2D" uid="uid://udr2ynxlr3hy" path="res://assets/images/HUD/boar.png" id="4_kon6v"]
+[ext_resource type="Texture2D" uid="uid://btlhx1wllflna" path="res://assets/images/HUD/capitan_meow.png" id="5_krpob"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rk4tb"]
 texture = ExtResource("1_mfgra")
@@ -79,3 +80,10 @@ offset_top = 813.0
 offset_right = 1539.0
 offset_bottom = 1029.0
 texture = ExtResource("4_kon6v")
+
+[node name="CaptainTexture" type="TextureRect" parent="."]
+offset_left = 381.0
+offset_top = 813.0
+offset_right = 597.0
+offset_bottom = 1029.0
+texture = ExtResource("5_krpob")

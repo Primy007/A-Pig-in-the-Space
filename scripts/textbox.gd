@@ -6,6 +6,7 @@ extends CanvasLayer
 @onready var label: Label = $TextboxContainer/MarginContainer/HBoxContainer/Label
 @onready var timer: Timer = $Timer
 @onready var player_texture: TextureRect = $PlayerTexture
+@onready var captain_texture: TextureRect = $CaptainTexture
 
 var full_text: String = ""
 var current_index: int = 0
@@ -70,6 +71,7 @@ func hide_textbox():
 	timer.stop()
 	
 	player_texture.hide() #provvisorio
+	captain_texture.hide()
 
 func show_textbox():
 	start.text = "*"
@@ -78,6 +80,7 @@ func show_textbox():
 	# Il timer lo avvieremo in show_text()
 	
 	player_texture.show() #provvisorio
+	captain_texture.show()
 
 func display_text():
 	var next_text = text_queue.pop_front()
