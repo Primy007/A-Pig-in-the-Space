@@ -21,6 +21,8 @@ var is_dying: bool = false
 @onready var player = get_tree().get_first_node_in_group("player")
 @onready var health_bar = $HealthBar
 
+
+# --- Metodi pubblici ---
 func _ready():
 	animation_flying.play("Normal")
 	_validate_setup()
@@ -46,7 +48,7 @@ func _physics_process(delta):
 		_shoot()
 		attack_cooldown.start(fire_rate)
 
-# --- Metodi privati ---
+# --- PRIVATE METHODS ---
 func _validate_setup():
 	if !player:
 		printerr("Player non trovato nel gruppo 'player'!")

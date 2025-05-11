@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bj6bs7ber1wu5"]
+
+[ext_resource type="Texture2D" uid="uid://bahstj78nmuly" path="res://assets/images/HUD/healt_bar/fuori.png" id="1_e37iv"]
+[ext_resource type="Texture2D" uid="uid://c84qhop80f2im" path="res://assets/images/HUD/healt_bar/progresso.png" id="2_qbeek"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+offset_left = 90.0
+offset_top = 60.0
+offset_right = 217.0
+offset_bottom = 76.0
+scale = Vector2(5, 5)
+value = 100.0
+texture_over = ExtResource("1_e37iv")
+texture_progress = ExtResource("2_qbeek")
+texture_progress_offset = Vector2(20, 5)

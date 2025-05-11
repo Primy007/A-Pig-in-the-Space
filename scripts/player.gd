@@ -32,9 +32,24 @@ var can_shoot: bool = true
 var shake_intensity: float = 0.0
 var original_camera_offset: Vector2 = Vector2.ZERO
 
+# --- HEALTH ---
+var is_dying: bool = false
+var health_bar: TextureProgressBar
+@export var max_health = 100
+@export var current_health = 100
+
 func _ready():
 	_setup_camera()
 	_reset_visuals()
+
+	# Istanzio l'HUD (che è un CanvasLayer)
+	var hud = preload("res://scenes/player/player_health_bar.tscn").instantiate()
+	get_tree().root.add_child(hud)
+
+	# Prendo la TextureProgressBar al suo interno
+	health_bar = hud.get_node("TextureProgressBar")
+	health_bar.max_value = max_health
+	health_bar.value = current_health
 
 func _physics_process(delta):
 	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -130,6 +145,25 @@ func apply_screen_shake(strength: float, duration: float):
 	shake_tween.tween_property(self, "shake_intensity", 0.0, duration)
 	await shake_tween.finished
 	camera.offset = original_camera_offset
+
+func take_damage(damage):
+	current_health -= damage
+	current_health = clamp(current_health, 0, max_health)
+	update_health_bar()
+
+	if current_health <= 0 and not is_dying:
+		is_dying = true
+		_handle_dead()
+
+func _handle_dead():
+	die()
+
+func update_health_bar():
+	health_bar.value = current_health
+
+func die():
+	queue_free()  # O animazione di morte, esplosione, ecc.
+
 
 # --- SIGNAL HANDLERS ---
 func _on_fire_sprite_animation_finished():
