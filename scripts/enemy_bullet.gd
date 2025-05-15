@@ -2,6 +2,7 @@ extends Area2D
 
 var speed = 600  # Velocità del proiettile
 var direction = Vector2.ZERO  # Direzione predefinita (verrà sovrascritta)
+var damage = 1  # Quantità di danno che il proiettile infligge
 
 @onready var anim_explosion = $Bullet_animation
 
@@ -18,9 +19,9 @@ func _on_body_entered(body):
 		handle_bullet_explosion()
 
 	elif body.is_in_group("player"):  #se entra nel gruppo player allora fa scomparire il body e scompare
-		# 1) Infliggi danno all'enemy
+		# 1) Infliggi danno al player
 		if body.has_method("take_damage"):
-			body.take_damage(1)  # cambia 30 col valore di danno desiderato
+			body.take_damage(damage)  # Infligge il danno (ora con effetto camera shake)
 
 		handle_bullet_explosion()
 

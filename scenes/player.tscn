@@ -128,7 +128,7 @@ position = Vector2(674, 437)
 script = ExtResource("1_xko3q")
 bullet_scene = ExtResource("2_kv8da")
 muzzle_marker = NodePath("Marker2D")
-camera_smooth_speed = 3.0
+camera_smooth_speed = 6.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_5qhnl")
@@ -163,6 +163,7 @@ remote_path = NodePath("../Camera2D")
 process_callback = 0
 position_smoothing_enabled = true
 position_smoothing_speed = 2.0
+editor_draw_drag_margin = true
 
 [node name="SparkSFX" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("7_ojqlg")

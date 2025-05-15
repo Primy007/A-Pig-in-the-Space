@@ -3,14 +3,16 @@ extends CharacterBody2D
 # --- CONSTANTS ---
 const FIRE_RATE: float = 0.2
 const SHOOT_EFFECT_DURATION: float = 0.16
-const BASE_SHAKE_STRENGTH: float = 14.0
+const BASE_SHAKE_STRENGTH: float = 5.0  # Ridotto da 14.0
 const SHAKE_DURATION: float = 0.15
+const HIT_SHAKE_STRENGTH: float = 18.0  # Nuovo valore per quando il player viene colpito
+const HIT_SHAKE_DURATION: float = 0.2   # Durata più lunga per l'impatto
 
 # --- MOVEMENT SETTINGS ---
 @export var speed: int = 500
 @export var acceleration: int = 700
 @export var friction: int = 600
-@export var rotation_speed: float = 3
+@export var rotation_speed: float = 8.0  # Increased for smoother mouse rotation
 
 # --- SHOOTING SETTINGS ---
 @export var bullet_scene: PackedScene
@@ -31,6 +33,7 @@ var fire_state: FireState = FireState.OFF
 var can_shoot: bool = true
 var shake_intensity: float = 0.0
 var original_camera_offset: Vector2 = Vector2.ZERO
+var is_thrusting: bool = false
 
 # --- HEALTH ---
 var is_dying: bool = false
@@ -52,18 +55,17 @@ func _ready():
 	health_bar.value = current_health
 
 func _physics_process(delta):
-	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	
-	_handle_movement(input_vector, delta)
-	_update_fire_animation(input_vector)
+	_handle_rotation(delta)
+	_handle_movement(delta)
+	_update_fire_animation()
 	_handle_shooting()
 	_apply_camera_effects(delta)
 	
 	move_and_slide()
 
 # --- PRIVATE METHODS ---
-func _is_moving(input_vector: Vector2) -> bool:
-	return input_vector != Vector2.ZERO
+func _is_moving() -> bool:
+	return is_thrusting
 
 func _setup_camera():
 	camera.position_smoothing_enabled = true
@@ -75,21 +77,30 @@ func _reset_visuals():
 	$Fire_Sprite.visible = false
 	$Shoot_effect.visible = false
 
-func _handle_movement(input_vector: Vector2, delta: float):
-	if input_vector != Vector2.ZERO:
-		_rotate_ship(input_vector, delta)
-		velocity = velocity.move_toward(input_vector.normalized() * speed, acceleration * delta)
+func _handle_rotation(delta: float):
+	var mouse_pos = get_global_mouse_position()
+	var direction = global_position.direction_to(mouse_pos)
+	var target_angle = direction.angle() + PI/2
+	
+	# Smooth rotation towards mouse
+	rotation = lerp_angle(rotation, target_angle, rotation_speed * delta)
+
+func _handle_movement(delta: float):
+	# Update thrusting state based on spacebar input
+	is_thrusting = Input.is_action_pressed("ui_select")  # "ui_select" is spacebar by default
+	
+	if is_thrusting:
+		# Move forward in the direction the ship is facing
+		var move_direction = -transform.y  # In Godot, negative Y is forward when rotated 0
+		velocity = velocity.move_toward(move_direction * speed, acceleration * delta)
 		animation_flying.play("Flying")
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
-		animation_flying.stop()
+		if velocity.length() < 10:  # Small threshold to avoid flickering
+			animation_flying.stop()
 
-func _rotate_ship(input_vector: Vector2, delta: float):
-	var target_angle = input_vector.angle() + PI/2
-	rotation = lerp_angle(rotation, target_angle, rotation_speed * delta)
-
-func _update_fire_animation(input_vector: Vector2):
-	if input_vector != Vector2.ZERO:
+func _update_fire_animation():
+	if is_thrusting:
 		_handle_moving_animation()
 	else:
 		_handle_stopping_animation()
@@ -150,6 +161,9 @@ func take_damage(damage):
 	current_health -= damage
 	current_health = clamp(current_health, 0, max_health)
 	update_health_bar()
+	
+	# Aggiungi l'effetto di tremore della telecamera quando il giocatore viene colpito
+	apply_screen_shake(HIT_SHAKE_STRENGTH, HIT_SHAKE_DURATION)
 
 	if current_health <= 0 and not is_dying:
 		is_dying = true
@@ -167,11 +181,9 @@ func die():
 
 # --- SIGNAL HANDLERS ---
 func _on_fire_sprite_animation_finished():
-	var current_input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	
 	match fire_state:
 		FireState.SPARK:
-			if _is_moving(current_input):
+			if _is_moving():
 				fire_state = FireState.FIRE_LOOP
 				animation_fire.play("fire_loop")
 			else:
