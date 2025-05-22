@@ -41,6 +41,20 @@ var health_bar: TextureProgressBar
 @export var max_health = 100
 @export var current_health = 100
 
+# --- POWER-UPS ---
+var active_powerups = []
+# Multi-shot
+var has_multi_shot: bool = false
+var multi_shot_count: int = 2
+var multi_shot_spread: float = 15.0
+# Shield
+var has_shield: bool = false
+var shield_health: int = 0
+# Variabili per altri power-up possono essere aggiunte qui
+
+# --- POWER-UP INDICATORS ---
+@onready var powerup_icons_container = $PowerupIconsContainer
+
 func _ready():
 	_setup_camera()
 	_reset_visuals()
@@ -53,6 +67,9 @@ func _ready():
 	health_bar = hud.get_node("TextureProgressBar")
 	health_bar.max_value = max_health
 	health_bar.value = current_health
+	
+	# Inizializza il gruppo del player
+	add_to_group("player")
 
 func _physics_process(delta):
 	_handle_rotation(delta)
@@ -135,15 +152,61 @@ func _apply_camera_effects(delta: float):
 # --- PUBLIC METHODS ---
 func shoot():
 	if bullet_scene && muzzle_marker:
-		_fire_bullet()
+		if has_multi_shot:
+			_fire_multi_shot()
+		else:
+			_fire_single_bullet()
+			
 		_show_shoot_effect()
 		apply_screen_shake(BASE_SHAKE_STRENGTH, SHAKE_DURATION)
 
-func _fire_bullet():
+func _fire_single_bullet():
 	var bullet = bullet_scene.instantiate()
 	bullet.global_position = muzzle_marker.global_position
 	bullet.direction = -muzzle_marker.global_transform.y
 	get_tree().current_scene.add_child(bullet)
+	
+	# Applica i powerup al proiettile
+	_apply_powerups_to_bullet(bullet)
+
+func _fire_multi_shot():
+	# Calcola l'angolo base
+	var base_direction = -muzzle_marker.global_transform.y
+	var total_bullets = 1 + (multi_shot_count * 2)  # centrale + laterali
+	
+	# Se abbiamo un numero dispari, includi il proiettile centrale
+	if total_bullets % 2 == 1:
+		var center_bullet = bullet_scene.instantiate()
+		center_bullet.global_position = muzzle_marker.global_position
+		center_bullet.direction = base_direction
+		get_tree().current_scene.add_child(center_bullet)
+		_apply_powerups_to_bullet(center_bullet)
+	
+	# Calcola l'angolo per i proiettili laterali
+	var spread_rad = deg_to_rad(multi_shot_spread)
+	
+	# Crea i proiettili laterali simmetricamente
+	for i in range(multi_shot_count):
+		var angle = spread_rad * (i + 1)
+		
+		# Proiettile a sinistra
+		var left_bullet = bullet_scene.instantiate()
+		left_bullet.global_position = muzzle_marker.global_position
+		left_bullet.direction = base_direction.rotated(-angle)
+		get_tree().current_scene.add_child(left_bullet)
+		_apply_powerups_to_bullet(left_bullet)
+		
+		# Proiettile a destra
+		var right_bullet = bullet_scene.instantiate()
+		right_bullet.global_position = muzzle_marker.global_position
+		right_bullet.direction = base_direction.rotated(angle)
+		get_tree().current_scene.add_child(right_bullet)
+		_apply_powerups_to_bullet(right_bullet)
+
+func _apply_powerups_to_bullet(bullet):
+	# Applica tutti i power-up attivi al proiettile
+	for powerup in active_powerups:
+		powerup.apply_to_bullet(bullet)
 
 func _show_shoot_effect():
 	sprite_shoot.visible = true
@@ -158,6 +221,16 @@ func apply_screen_shake(strength: float, duration: float):
 	camera.offset = original_camera_offset
 
 func take_damage(damage):
+	# Se il giocatore ha lo scudo, il danno viene assorbito prima
+	if has_shield and shield_health > 0:
+		shield_health -= damage
+		if shield_health <= 0:
+			has_shield = false
+			# Disattiva effetto visivo dello scudo
+			if has_node("ShieldEffect"):
+				get_node("ShieldEffect").visible = false
+		return
+	
 	current_health -= damage
 	current_health = clamp(current_health, 0, max_health)
 	update_health_bar()
@@ -177,7 +250,6 @@ func update_health_bar():
 
 func die():
 	queue_free()  # O animazione di morte, esplosione, ecc.
-
 
 # --- SIGNAL HANDLERS ---
 func _on_fire_sprite_animation_finished():

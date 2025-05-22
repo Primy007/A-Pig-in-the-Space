@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bj6bs7ber1wu5"]
 
-[ext_resource type="Texture2D" uid="uid://bahstj78nmuly" path="res://assets/images/HUD/healt_bar/fuori.png" id="1_e37iv"]
-[ext_resource type="Texture2D" uid="uid://c84qhop80f2im" path="res://assets/images/HUD/healt_bar/progresso.png" id="2_qbeek"]
+[ext_resource type="Texture2D" uid="uid://5semyl0vjg11" path="res://assets/images/HUD/fuori_pers.png" id="1_kyyoj"]
+[ext_resource type="Texture2D" uid="uid://dxluem60v2vds" path="res://assets/images/HUD/dentro_pers.png" id="2_ombqn"]
 
 [node name="CanvasLayer" type="CanvasLayer"]
 
@@ -10,8 +10,6 @@ offset_left = 90.0
 offset_top = 60.0
 offset_right = 217.0
 offset_bottom = 76.0
-scale = Vector2(5, 5)
-value = 100.0
-texture_over = ExtResource("1_e37iv")
-texture_progress = ExtResource("2_qbeek")
-texture_progress_offset = Vector2(20, 5)
+texture_over = ExtResource("1_kyyoj")
+texture_progress = ExtResource("2_ombqn")
+texture_progress_offset = Vector2(165, 55)

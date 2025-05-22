@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RapidFirePowerUpStrategy" load_steps=3 format=3 uid="uid://biohhit4wb04x_rapid"]
+
+[ext_resource type="Script" path="res://scripts/rapid_fire_powerup_strategy.gd" id="1_rapid_strategy"]
+[ext_resource type="Texture2D" uid="uid://0aylbueaelkc" path="res://Art/Kenney/firework.png" id="2_firework_texture"]
+
+[resource]
+script = ExtResource("1_rapid_strategy")
+texture = ExtResource("2_firework_texture")
+upgrade_text = "Rapid Fire"
+duration = 12.0
+fire_rate_boost_percentage = 60.0

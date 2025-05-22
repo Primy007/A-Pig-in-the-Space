@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpeedBulletStrategy" load_steps=3 format=3 uid="uid://bfwoyu25j5me_speed"]
+
+[ext_resource type="Script" path="res://scripts/speed_bullet_strategy.gd" id="1_speed_strategy"]
+[ext_resource type="Texture2D" uid="uid://30ltamteuvkx" path="res://Art/Kenney/carrot.png" id="2_carrot_texture"]
+
+[resource]
+script = ExtResource("1_speed_strategy")
+texture = ExtResource("2_carrot_texture")
+upgrade_text = "Speed Boost"
+duration = 15.0
+speed_increase = 300.0

@@ -13,21 +13,24 @@ config_version=5
 config/name="Animal Space"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://assets/images/player/icona_gioco.png"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=3
+window/size/mode=4
 window/size/resizable=false
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
+mouse_cursor/custom_image="res://assets/images/interfaces/puntatore.png"
+mouse_cursor/custom_image_hotspot=Vector2(35, 38)
 
 [file_customization]
 
 folder_colors={
 "res://assets/": "orange",
+"res://resources/": "green",
 "res://scenes/": "red",
 "res://scripts/": "blue"
 }

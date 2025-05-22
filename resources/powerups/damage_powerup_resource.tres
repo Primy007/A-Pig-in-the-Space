@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DamageBulletStrategy" load_steps=3 format=3 uid="uid://dedt6x6r4b7h7_damage"]
+
+[ext_resource type="Script" path="res://scripts/damage_bullet_strategy.gd" id="1_damage_strategy"]
+[ext_resource type="Texture2D" uid="uid://53h01ho1lvwp" path="res://Art/Kenney/fish.png" id="2_fish_texture"]
+
+[resource]
+script = ExtResource("1_damage_strategy")
+texture = ExtResource("2_fish_texture")
+upgrade_text = "Damage Boost"
+duration = 20.0
+damage_increase = 25
