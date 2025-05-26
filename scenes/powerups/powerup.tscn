@@ -1,10 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://b6w4dksg3vhsc"]
+[gd_scene load_steps=6 format=3 uid="uid://b6w4dksg3vhsc"]
 
 [ext_resource type="Script" path="res://scripts/powerup.gd" id="1_oieo2"]
 [ext_resource type="Texture2D" uid="uid://oy1jh1d1t3kd" path="res://icon.svg" id="2_axk8l"]
+[ext_resource type="AudioStream" uid="uid://brtkdcw1cs26i" path="res://assets/audio/sfx/explosion/11L-generate_me_the_soun-1745792972469.mp3" id="3_0f084"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kwoy"]
 radius = 25.0
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_2hcdh"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
 
 [node name="PowerUp" type="Area2D" node_paths=PackedStringArray("label", "sprite", "particles", "pickup_sound")]
 collision_layer = 129
@@ -37,10 +42,12 @@ text = "Power-Up"
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 emitting = false
 amount = 30
+process_material = SubResource("ParticleProcessMaterial_2hcdh")
 lifetime = 1.5
 one_shot = true
 
 [node name="PickupSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_0f084")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 
