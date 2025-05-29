@@ -68,23 +68,35 @@ func apply_powerup(player):
 		if !player.active_powerups.has(power_up_strategy):
 			player.active_powerups.append(power_up_strategy)
 		
-		# Se il power-up ha una durata, imposta un timer per rimuoverlo
+		# CORREZIONE: Se il power-up ha una durata, crea il timer nel main scene
 		if power_up_strategy.duration > 0:
 			var timer = Timer.new()
 			timer.wait_time = power_up_strategy.duration
 			timer.one_shot = true
-			player.add_child(timer)
-			timer.timeout.connect(func(): remove_powerup(player, power_up_strategy))
+			# Aggiungi il timer alla scena principale invece che al player
+			get_tree().current_scene.add_child(timer)
+			# IMPORTANTE: Usa una reference debole per evitare crash
+			var powerup_ref = power_up_strategy
+			timer.timeout.connect(func(): _remove_powerup_safely(player, powerup_ref, timer))
 			timer.start()
 
-func remove_powerup(player, strategy):
+func _remove_powerup_safely(player, strategy, timer):
+	# Verifica che il player sia ancora valido
+	if !is_instance_valid(player):
+		if is_instance_valid(timer):
+			timer.queue_free()
+		return
+	
 	# Rimuovi la strategia dall'array di power-up attivi
 	if player.active_powerups.has(strategy):
 		player.active_powerups.erase(strategy)
 	
 	# Rimuovi l'effetto dal player
 	strategy.remove_from_player(player)
-
+	
+	# Pulisci il timer
+	if is_instance_valid(timer):
+		timer.queue_free()
 
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
-	pass # Replace with function body.
+	queue_free()

@@ -8,12 +8,20 @@ extends BasePowerUpStrategy
 var original_fire_rate: float
 
 func apply_to_player(player: CharacterBody2D) -> void:
-	# Salva il valore originale prima di modificarlo
+	# CORREZIONE: Salva il valore originale usando una proprietà dinamica
+	# dato che FIRE_RATE è una costante
 	original_fire_rate = player.FIRE_RATE
 	
-	# Riduce il cooldown tra i colpi (aumenta la frequenza di fuoco)
-	player.FIRE_RATE = original_fire_rate * (1 - fire_rate_boost_percentage / 100)
+	# Crea una proprietà dinamica per la fire rate modificata
+	player.set("modified_fire_rate", original_fire_rate * (1 - fire_rate_boost_percentage / 100))
+	
+	# Imposta un flag per indicare che la fire rate è modificata
+	player.set("has_rapid_fire", true)
 
 func remove_from_player(player: CharacterBody2D) -> void:
-	# Ripristina il valore originale
-	player.FIRE_RATE = original_fire_rate
+	# Rimuovi le proprietà dinamiche
+	player.set("has_rapid_fire", false)
+	if player.has_method("remove_meta"):
+		player.remove_meta("modified_fire_rate")
+
+# NOTA: Il player.gd dovrà essere modificato per utilizzare modified_fire_rate quando has_rapid_fire è true

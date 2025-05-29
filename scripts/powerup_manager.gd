@@ -34,9 +34,11 @@ func _ready():
 func _preload_powerup_scenes():
 	# Qui puoi precaricare tutte le scene di power-up
 	# Esempio:
-	# powerup_scenes["speed"] = preload("res://scenes/powerups/speed_powerup.tscn")
-	# powerup_scenes["damage"] = preload("res://scenes/powerups/damage_powerup.tscn")
-	# powerup_scenes["pierce"] = preload("res://scenes/powerups/pierce_powerup.tscn")
+	powerup_scenes["multi_shot"] = preload("res://scenes/powerups/multi_shot_poweup.tscn")
+	powerup_scenes["damage_bullet"] = preload("res://scenes/powerups/damage_bullet_powerup.tscn")
+	powerup_scenes["pierce"] = preload("res://scenes/powerups/pierce_powerup.tscn")
+	powerup_scenes["pierce"] = preload("res://scenes/powerups/pierce_powerup.tscn")
+	powerup_scenes["speed_bullet"] = preload("res://scenes/powerups/speed_bullet_powerup.tscn")
 	pass
 
 func _find_components():

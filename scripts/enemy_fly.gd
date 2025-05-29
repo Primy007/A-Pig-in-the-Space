@@ -2,12 +2,11 @@ extends CharacterBody2D
 
 var is_dying: bool = false
 
-
 # --- Configurazione esposta ---
 @export var speed: float = 200
-@export var stop_distance_x: float = 800  # Distanza orizzontale per fermarsi
-@export var stop_distance_y: float = 500  # Distanza verticale per fermarsi
-@export var flee_distance: float = 300    # Distanza euclidea per iniziare a fuggire
+@export var stop_distance_x: float = 800
+@export var stop_distance_y: float = 500
+@export var flee_distance: float = 300
 @export var flee_speed: float = 150
 @export var fire_rate: float = 1.0
 @export var bullet_scene: PackedScene
@@ -15,22 +14,23 @@ var is_dying: bool = false
 @export var max_health = 100
 @export var current_health = 100
 
+# AGGIUNTO: Configurazione per power-up drop
+@export var powerup_drop_chance: float = 0.3  # 30% di probabilità
+@export var powerup_scenes: Array[PackedScene] = []  # Array di scene power-up
+
 # --- Riferimenti ai nodi ---
 @onready var animation_flying = $Enemy_flying
 @onready var attack_cooldown = $AttackCooldown
 @onready var player = get_tree().get_first_node_in_group("player")
 @onready var health_bar = $HealthBar
 
-
-# --- Metodi pubblici ---
 func _ready():
 	animation_flying.play("Normal")
 	_validate_setup()
 	update_health_bar()
 
 func _process(delta):
-	var offset = Vector2(-55, -80)  # regola Y a piacere
-	# sposto la barra in coordinate globali
+	var offset = Vector2(-55, -80)
 	health_bar.global_position = global_position + offset
 
 func _physics_process(delta):
@@ -48,7 +48,6 @@ func _physics_process(delta):
 		_shoot()
 		attack_cooldown.start(fire_rate)
 
-# --- PRIVATE METHODS ---
 func _validate_setup():
 	if !player:
 		printerr("Player non trovato nel gruppo 'player'!")
@@ -103,26 +102,36 @@ func take_damage(damage):
 		_handle_dead()
 
 func _handle_dead():
-	attack_cooldown.stop()                   # se vuoi fermare il timer
-	# (facoltativo) rimuovi il nemico dal gruppo “enemies”:
+	attack_cooldown.stop()
 	remove_from_group("enemies")
-	 # Az zero tutti i layer di collisione del CharacterBody2D
 	collision_layer = 0
 	collision_mask = 0
-	
 	health_bar.visible = false
 	
-	# suono di morte
-	$DeathSFX.play()
+	# AGGIUNTO: Prova a droppare un power-up prima di morire
+	_try_drop_powerup()
 	
-	#fa partire l'animazione
+	$DeathSFX.play()
 	animation_flying.play("Explosion")
 	await animation_flying.animation_finished
-	#lo elimina
 	die()
+
+# AGGIUNTO: Funzione per droppare power-up
+func _try_drop_powerup():
+	# Controlla se deve droppare un power-up
+	if randf() <= powerup_drop_chance and !powerup_scenes.is_empty():
+		# Scegli un power-up casuale
+		var random_powerup_scene = powerup_scenes.pick_random()
+		var powerup = random_powerup_scene.instantiate()
+		
+		# Posiziona il power-up nella posizione del nemico
+		powerup.global_position = global_position
+		
+		# Aggiungi alla scena principale
+		get_tree().current_scene.add_child(powerup)
 
 func update_health_bar():
 	health_bar.value = current_health
 
 func die():
-	queue_free()  # O animazione di morte, esplosione, ecc.
+	queue_free()

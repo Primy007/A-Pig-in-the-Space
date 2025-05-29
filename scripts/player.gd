@@ -138,7 +138,13 @@ func _handle_shooting():
 	if Input.is_action_pressed("fire") && can_shoot:
 		shoot()
 		can_shoot = false
-		await get_tree().create_timer(FIRE_RATE).timeout
+		
+		# CORREZIONE: Usa fire rate modificata se disponibile
+		var current_fire_rate = FIRE_RATE
+		if get("has_rapid_fire") and get("modified_fire_rate"):
+			current_fire_rate = get("modified_fire_rate")
+			
+		await get_tree().create_timer(current_fire_rate).timeout
 		can_shoot = true
 
 func _apply_camera_effects(delta: float):
