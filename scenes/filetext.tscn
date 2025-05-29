@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://filetext123"]
+
+[ext_resource type="Script" path="res://scripts/filetext.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bopbvofda0aml" path="res://assets/images/HUD/icons/filetext.png" id="2_sy01u"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(32, 32)
+
+[node name="FileText" type="Area2D"]
+script = ExtResource("1")
+text_content = "This is a sample text that will appear when collected!"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_sy01u")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")

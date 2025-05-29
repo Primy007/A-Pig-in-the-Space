@@ -35,14 +35,48 @@ func _on_body_entered(body):
 	if body.is_in_group("player"):
 		apply_powerup(body)
 		
+		# Nascondi il powerup visualmente ma non eliminarlo ancora
+		hide_powerup()
+		
+		# Riproduci il suono
 		if pickup_sound:
 			pickup_sound.play()
-		
-		if particles:
-			particles.emitting = true
-			particles.reparent(get_tree().root)
-		
-		queue_free()
+			# Metodo 1: Usa il segnale finished (preferito)
+			if not pickup_sound.finished.is_connected(_on_pickup_sound_finished):
+				pickup_sound.finished.connect(_on_pickup_sound_finished)
+			
+			# Metodo 2: Backup con timer nel caso il segnale non funzioni
+			var audio_length = pickup_sound.stream.get_length()
+			await get_tree().create_timer(audio_length + 0.1).timeout
+			if is_instance_valid(self):
+				_cleanup_powerup()
+		else:
+			# Se non c'è suono, elimina immediatamente
+			_cleanup_powerup()
+
+func hide_powerup():
+	# Nascondi tutti gli elementi visivi
+	if sprite:
+		sprite.visible = false
+	if label:
+		label.visible = false
+	
+	# Disabilita la collisione per evitare pickup multipli
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+
+func _on_pickup_sound_finished():
+	if is_instance_valid(self):
+		_cleanup_powerup()
+
+func _cleanup_powerup():
+	# Gestisci le particelle
+	if particles:
+		particles.emitting = true
+		particles.reparent(get_tree().root)
+	
+	# Elimina il powerup
+	queue_free()
 
 func apply_powerup(player):
 	if !power_up_strategy:

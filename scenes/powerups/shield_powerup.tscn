@@ -66,6 +66,7 @@ one_shot = true
 
 [node name="PickupSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("6_exff4")
+bus = &"sfx"
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 

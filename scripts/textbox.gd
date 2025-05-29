@@ -21,6 +21,7 @@ var current_state = State.READY
 var text_queue = []
 
 func _ready():
+	add_to_group("textbox")  # Aggiungi questa riga
 	print("starting state: READY")
 	hide_textbox()
 	timer.connect("timeout", Callable(self, "_on_Timer_timeout"))

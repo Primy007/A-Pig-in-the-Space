@@ -1,6 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://bvuge3ghg5v4"]
+[gd_scene load_steps=15 format=3 uid="uid://bvuge3ghg5v4"]
 
 [ext_resource type="PackedScene" uid="uid://peodo11jl1nh" path="res://scenes/asteroid.tscn" id="1_15ar3"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_ftjo1"]
 [ext_resource type="Script" path="res://scripts/parallax_background.gd" id="2_y25m8"]
 [ext_resource type="Texture2D" uid="uid://bwgq04d5523lr" path="res://assets/images/background/EmptyStarfield.jpg" id="3_12b7q"]
 [ext_resource type="PackedScene" uid="uid://jo02i8tp7axw" path="res://scenes/enemy_fly.tscn" id="5_mw37l"]
@@ -12,24 +13,10 @@
 [ext_resource type="PackedScene" uid="uid://dbwui5of42v1g" path="res://scenes/powerups/speed_bullet_powerup.tscn" id="10_62a42"]
 [ext_resource type="PackedScene" uid="uid://bcid02xlge1km" path="res://scenes/powerups/rapid_fire_powerup.tscn" id="11_w75ry"]
 [ext_resource type="PackedScene" uid="uid://c8qei2s2hwh5a" path="res://scenes/powerups/shield_powerup.tscn" id="12_bls3h"]
-
-[sub_resource type="GDScript" id="GDScript_ce4gr"]
-script/source = "extends Node
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	var indicator_manager = preload(\"res://scenes/HUD/indicator_manager.tscn\").instantiate()
-	add_child(indicator_manager)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-"
+[ext_resource type="PackedScene" uid="uid://filetext123" path="res://scenes/filetext.tscn" id="13_na2nm"]
 
 [node name="Main" type="Node"]
-script = SubResource("GDScript_ce4gr")
+script = ExtResource("1_ftjo1")
 
 [node name="Asteroid" parent="." instance=ExtResource("1_15ar3")]
 position = Vector2(2784, 703)
@@ -83,3 +70,6 @@ position = Vector2(1064, 115)
 
 [node name="shield_powerup" parent="." instance=ExtResource("12_bls3h")]
 position = Vector2(493, 108)
+
+[node name="FileText" parent="." instance=ExtResource("13_na2nm")]
+position = Vector2(-963, -422)
