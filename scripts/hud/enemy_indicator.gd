@@ -48,7 +48,8 @@ func _update_indicator():
 	if !camera:
 		return
 		
-	var enemy_screen_pos = camera.to_screen_coords_no_centering(target_enemy.global_position)
+	# Converti la posizione del nemico in coordinate schermo
+	var enemy_screen_pos = _world_to_screen_position(target_enemy.global_position, camera)
 	
 	# Se il nemico è visibile, nascondi l'indicatore
 	if _is_enemy_on_screen(enemy_screen_pos):
@@ -111,6 +112,19 @@ func _calculate_edge_position(enemy_screen_pos: Vector2) -> Vector2:
 	edge_pos.y = clamp(edge_pos.y, top_margin, bottom_margin)
 	
 	return edge_pos
+
+func _world_to_screen_position(world_pos: Vector2, camera: Camera2D) -> Vector2:
+	"""Converte una posizione mondiale in coordinate schermo"""
+	var viewport_size = get_viewport().get_visible_rect().size
+	var camera_center = camera.global_position
+	var zoom = camera.zoom
+	
+	# Calcola la posizione relativa alla camera
+	var relative_pos = (world_pos - camera_center) * zoom
+	
+	# Converte in coordinate schermo
+	var screen_center = viewport_size * 0.5
+	return screen_center + relative_pos
 
 func _rotate_arrow_to_enemy():
 	"""Ruota la freccia per puntare verso il nemico"""
