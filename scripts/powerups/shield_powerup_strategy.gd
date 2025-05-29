@@ -21,7 +21,7 @@ func remove_from_player(player: CharacterBody2D) -> void:
 	player.has_shield = false
 	player.shield_health = 0
 	
-	# Nascondiamo l'effetto visivo
+	# Nascondiamo l'effetto visivo 
 	if player.has_node("ShieldEffect"):
 		player.get_node("ShieldEffect").visible = false
 
