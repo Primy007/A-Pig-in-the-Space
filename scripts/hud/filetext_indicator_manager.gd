@@ -45,12 +45,12 @@ func _create_indicator_for_filetext(filetext: Node2D):
 	
 	active_indicators[filetext] = indicator
 	
-	# Connetti il segnale di raccolta per rimuovere l'indicatore
+	# SOLUZIONE: Usa un callable lambda che ignora gli argomenti del segnale
 	if filetext.has_signal("file_collected"):
-		filetext.file_collected.connect(_on_filetext_collected.bind(filetext))
+		filetext.file_collected.connect(func(_arg1 = null, _arg2 = null): _remove_indicator_for_filetext(filetext))
 
-func _on_filetext_collected(filetext: Node2D):
-	"""Rimuove l'indicatore quando il file di testo viene raccolto"""
+func _remove_indicator_for_filetext(filetext: Node2D):
+	"""Rimuove l'indicatore per un filetext specifico"""
 	if active_indicators.has(filetext):
 		var indicator = active_indicators[filetext]
 		if is_instance_valid(indicator):
