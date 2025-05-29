@@ -138,5 +138,5 @@ func _rotate_arrow_to_enemy():
 
 func _update_distance():
 	"""Aggiorna il testo della distanza"""
-	var distance = player.global_position.distance_to(target_enemy.global_position)-500
+	var distance = (player.global_position.distance_to(target_enemy.global_position)-500)/10
 	distance_label.text = str(int(distance)) + "m"

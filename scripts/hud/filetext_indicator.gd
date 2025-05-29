@@ -138,5 +138,5 @@ func _rotate_arrow_to_filetext():
 
 func _update_distance():
 	"""Aggiorna il testo della distanza"""
-	var distance = player.global_position.distance_to(target_filetext.global_position)
+	var distance = (player.global_position.distance_to(target_filetext.global_position)-500)/10
 	distance_label.text = str(int(distance)) + "m"

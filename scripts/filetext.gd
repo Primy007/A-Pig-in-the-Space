@@ -6,7 +6,7 @@ class_name FileText
 @export var collected: bool = false
 
 # Segnali
-signal file_collected(text_content: String)
+signal file_collected(filetext: FileText)
 
 # Riferimenti ai nodi
 @onready var sprite: Sprite2D = $Sprite2D
