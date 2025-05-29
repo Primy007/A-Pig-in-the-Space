@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/hud/enemy_indicator_manager.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/HUD/enemy_indicator.tscn" id="2"]
+
+[node name="EnemyIndicatorManager" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1")
+indicator_scene = ExtResource("2")
