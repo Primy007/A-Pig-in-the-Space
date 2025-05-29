@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bvuge3ghg5v4"]
+[gd_scene load_steps=14 format=3 uid="uid://bvuge3ghg5v4"]
 
 [ext_resource type="PackedScene" uid="uid://peodo11jl1nh" path="res://scenes/asteroid.tscn" id="1_15ar3"]
 [ext_resource type="Script" path="res://scripts/parallax_background.gd" id="2_y25m8"]
@@ -6,7 +6,12 @@
 [ext_resource type="PackedScene" uid="uid://jo02i8tp7axw" path="res://scenes/enemy_fly.tscn" id="5_mw37l"]
 [ext_resource type="PackedScene" uid="uid://v3hdef2mwb1l" path="res://scenes/player.tscn" id="5_ul1qq"]
 [ext_resource type="PackedScene" uid="uid://decgqip5dj2nh" path="res://scenes/HUD/textbox.tscn" id="6_l54ps"]
+[ext_resource type="PackedScene" uid="uid://ba3r0mobw15ty" path="res://scenes/powerups/damage_bullet_powerup.tscn" id="7_an1vd"]
+[ext_resource type="PackedScene" uid="uid://dvy35q1g5157t" path="res://scenes/powerups/pierce_powerup.tscn" id="9_cj8va"]
 [ext_resource type="PackedScene" uid="uid://x1bqkyc8ashn" path="res://scenes/powerups/multi_shot_poweup.tscn" id="9_qum0l"]
+[ext_resource type="PackedScene" uid="uid://dbwui5of42v1g" path="res://scenes/powerups/speed_bullet_powerup.tscn" id="10_62a42"]
+[ext_resource type="PackedScene" uid="uid://bcid02xlge1km" path="res://scenes/powerups/rapid_fire_powerup.tscn" id="11_w75ry"]
+[ext_resource type="PackedScene" uid="uid://c8qei2s2hwh5a" path="res://scenes/powerups/shield_powerup.tscn" id="12_bls3h"]
 
 [sub_resource type="GDScript" id="GDScript_ce4gr"]
 script/source = "extends Node
@@ -61,5 +66,20 @@ position = Vector2(9710.35, 2517.42)
 
 [node name="Textbox" parent="." instance=ExtResource("6_l54ps")]
 
-[node name="PowerUp" parent="." instance=ExtResource("9_qum0l")]
-position = Vector2(774, 74)
+[node name="multishot_powerup" parent="." instance=ExtResource("9_qum0l")]
+position = Vector2(596, 109)
+
+[node name="damage_powerup" parent="." instance=ExtResource("7_an1vd")]
+position = Vector2(728, 115)
+
+[node name="pierce_powerup" parent="." instance=ExtResource("9_cj8va")]
+position = Vector2(846, 115)
+
+[node name="PowerUp" parent="." instance=ExtResource("10_62a42")]
+position = Vector2(956, 110)
+
+[node name="PowerUp2" parent="." instance=ExtResource("11_w75ry")]
+position = Vector2(1064, 115)
+
+[node name="shield_powerup" parent="." instance=ExtResource("12_bls3h")]
+position = Vector2(493, 108)

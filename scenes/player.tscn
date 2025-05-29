@@ -124,6 +124,7 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_marker") groups=["player"]]
+z_index = 1
 position = Vector2(674, 437)
 script = ExtResource("1_xko3q")
 bullet_scene = ExtResource("2_kv8da")

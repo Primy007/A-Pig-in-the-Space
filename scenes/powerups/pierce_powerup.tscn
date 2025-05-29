@@ -1,15 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://dvy35q1g5157t"]
+[gd_scene load_steps=9 format=3 uid="uid://dvy35q1g5157t"]
 
+[ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="1_2342y"]
 [ext_resource type="Script" path="res://scripts/powerup.gd" id="1_lmklc"]
-[ext_resource type="Texture2D" uid="uid://oy1jh1d1t3kd" path="res://icon.svg" id="2_o1ydk"]
 [ext_resource type="Script" path="res://scripts/powerups/pierce_bullet_strategy.gd" id="2_quk68"]
 [ext_resource type="AudioStream" uid="uid://brtkdcw1cs26i" path="res://assets/audio/sfx/explosion/11L-generate_me_the_soun-1745792972469.mp3" id="3_p1bng"]
+[ext_resource type="Texture2D" uid="uid://cf7ghfogbryfp" path="res://assets/images/powerups/pierce_powerup.png" id="4_gmeen"]
 
 [sub_resource type="Resource" id="Resource_an17p"]
 script = ExtResource("2_quk68")
 additional_pierce = 2
-texture = ExtResource("2_o1ydk")
-upgrade_text = "Pierce"
+texture = ExtResource("4_gmeen")
+upgrade_text = "Piercing Flower"
 duration = 10.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kwoy"]
@@ -19,7 +20,8 @@ radius = 25.0
 particle_flag_disable_z = true
 gravity = Vector3(0, 98, 0)
 
-[node name="PowerUp" type="Area2D" node_paths=PackedStringArray("label", "sprite", "particles", "pickup_sound")]
+[node name="pierce_powerup" type="Area2D" node_paths=PackedStringArray("label", "sprite", "particles", "pickup_sound")]
+material = ExtResource("1_2342y")
 collision_layer = 129
 script = ExtResource("1_lmklc")
 power_up_strategy = SubResource("Resource_an17p")
@@ -32,7 +34,8 @@ pickup_sound = NodePath("PickupSound")
 shape = SubResource("CircleShape2D_1kwoy")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_o1ydk")
+material = ExtResource("1_2342y")
+texture = ExtResource("4_gmeen")
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 8
@@ -41,14 +44,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -38.0
-offset_top = 61.5
+offset_top = 31.5
 offset_right = 38.0
-offset_bottom = 84.5
+offset_bottom = 54.5
 grow_horizontal = 2
 grow_vertical = 2
 text = "Power-Up"
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+visible = false
 emitting = false
 amount = 30
 process_material = SubResource("ParticleProcessMaterial_2hcdh")

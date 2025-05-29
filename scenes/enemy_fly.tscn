@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://jo02i8tp7axw"]
+[gd_scene load_steps=31 format=3 uid="uid://jo02i8tp7axw"]
 
 [ext_resource type="Script" path="res://scripts/enemy_fly.gd" id="1_fpblk"]
 [ext_resource type="PackedScene" uid="uid://bxh4w6sm1iol5" path="res://scenes/EnemyBullet.tscn" id="2_q1mlb"]
@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" uid="uid://dvy35q1g5157t" path="res://scenes/powerups/pierce_powerup.tscn" id="5_a7piq"]
 [ext_resource type="PackedScene" uid="uid://dbwui5of42v1g" path="res://scenes/powerups/speed_bullet_powerup.tscn" id="6_2nmg0"]
 [ext_resource type="AudioStream" uid="uid://b1xeemt5cl5d4" path="res://assets/audio/sfx/explosion/170146__timgormly__8-bit-explosion.mp3" id="6_h44jh"]
+[ext_resource type="PackedScene" uid="uid://bcid02xlge1km" path="res://scenes/powerups/rapid_fire_powerup.tscn" id="7_rpwo1"]
+[ext_resource type="PackedScene" uid="uid://c8qei2s2hwh5a" path="res://scenes/powerups/shield_powerup.tscn" id="8_a7q3c"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rjq6y"]
 atlas = ExtResource("4_nc4si")
@@ -141,11 +143,13 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [node name="Enemy_Fly" type="CharacterBody2D" node_paths=PackedStringArray("muzzle_markers") groups=["enemies"]]
+z_index = 1
 position = Vector2(179, 232)
 script = ExtResource("1_fpblk")
 bullet_scene = ExtResource("2_q1mlb")
 muzzle_markers = [NodePath("Marker"), NodePath("Marker2")]
-powerup_scenes = Array[PackedScene]([ExtResource("3_3yghl"), ExtResource("4_a2ajj"), ExtResource("5_a7piq"), ExtResource("6_2nmg0")])
+powerup_drop_chance = 1.0
+powerup_scenes = Array[PackedScene]([ExtResource("3_3yghl"), ExtResource("4_a2ajj"), ExtResource("5_a7piq"), ExtResource("6_2nmg0"), ExtResource("7_rpwo1"), ExtResource("8_a7q3c")])
 
 [node name="Enemy_flying" type="AnimatedSprite2D" parent="."]
 texture_filter = 2
