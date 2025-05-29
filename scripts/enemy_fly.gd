@@ -14,9 +14,9 @@ var is_dying: bool = false
 @export var max_health = 100
 @export var current_health = 100
 
-# AGGIUNTO: Configurazione per power-up drop
-@export var powerup_drop_chance: float = 0.3  # 30% di probabilità
-@export var powerup_scenes: Array[PackedScene] = []  # Array di scene power-up
+# Configurazione per power-up drop
+@export var powerup_drop_chance: float = 0.3
+@export var powerup_scenes: Array[PackedScene] = []
 
 # --- Riferimenti ai nodi ---
 @onready var animation_flying = $Enemy_flying
@@ -108,26 +108,19 @@ func _handle_dead():
 	collision_mask = 0
 	health_bar.visible = false
 	
-	# AGGIUNTO: Prova a droppare un power-up prima di morire
-	_try_drop_powerup()
+	# CORREZIONE: Usa call_deferred per evitare l'errore di collision query
+	call_deferred("_try_drop_powerup")
 	
 	$DeathSFX.play()
 	animation_flying.play("Explosion")
 	await animation_flying.animation_finished
 	die()
 
-# AGGIUNTO: Funzione per droppare power-up
 func _try_drop_powerup():
-	# Controlla se deve droppare un power-up
 	if randf() <= powerup_drop_chance and !powerup_scenes.is_empty():
-		# Scegli un power-up casuale
 		var random_powerup_scene = powerup_scenes.pick_random()
 		var powerup = random_powerup_scene.instantiate()
-		
-		# Posiziona il power-up nella posizione del nemico
 		powerup.global_position = global_position
-		
-		# Aggiungi alla scena principale
 		get_tree().current_scene.add_child(powerup)
 
 func update_health_bar():

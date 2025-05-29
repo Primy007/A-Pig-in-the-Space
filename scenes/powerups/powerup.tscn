@@ -51,4 +51,9 @@ stream = ExtResource("3_0f084")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 
-[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="queue_free"]
+[node name="Timer" type="Timer" parent="VisibleOnScreenNotifier2D"]
+wait_time = 10.0
+
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
+[connection signal="timeout" from="VisibleOnScreenNotifier2D/Timer" to="." method="_on_timer_timeout"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bvuge3ghg5v4"]
+[gd_scene load_steps=9 format=3 uid="uid://bvuge3ghg5v4"]
 
 [ext_resource type="PackedScene" uid="uid://peodo11jl1nh" path="res://scenes/asteroid.tscn" id="1_15ar3"]
 [ext_resource type="Script" path="res://scripts/parallax_background.gd" id="2_y25m8"]
@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://jo02i8tp7axw" path="res://scenes/enemy_fly.tscn" id="5_mw37l"]
 [ext_resource type="PackedScene" uid="uid://v3hdef2mwb1l" path="res://scenes/player.tscn" id="5_ul1qq"]
 [ext_resource type="PackedScene" uid="uid://decgqip5dj2nh" path="res://scenes/HUD/textbox.tscn" id="6_l54ps"]
-[ext_resource type="Script" path="res://scripts/powerup_spawner.gd" id="7_je4c6"]
 [ext_resource type="PackedScene" uid="uid://x1bqkyc8ashn" path="res://scenes/powerups/multi_shot_poweup.tscn" id="9_qum0l"]
 
 [sub_resource type="GDScript" id="GDScript_ce4gr"]
@@ -102,9 +101,6 @@ position = Vector2(14529.9, -1160.79)
 position = Vector2(1874.44, -3607.31)
 
 [node name="Textbox" parent="." instance=ExtResource("6_l54ps")]
-
-[node name="PowerUpSpawner" type="Node2D" parent="."]
-script = ExtResource("7_je4c6")
 
 [node name="PowerUp" parent="." instance=ExtResource("9_qum0l")]
 position = Vector2(774, 74)

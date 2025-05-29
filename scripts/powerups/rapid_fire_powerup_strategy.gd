@@ -7,6 +7,8 @@ extends BasePowerUpStrategy
 # Riferimento al valore originale della fire rate
 var original_fire_rate: float
 
+const POWERUP_ID = "rapid_fire"
+
 func apply_to_player(player: CharacterBody2D) -> void:
 	# CORREZIONE: Salva il valore originale usando una proprietà dinamica
 	# dato che FIRE_RATE è una costante
@@ -25,3 +27,6 @@ func remove_from_player(player: CharacterBody2D) -> void:
 		player.remove_meta("modified_fire_rate")
 
 # NOTA: Il player.gd dovrà essere modificato per utilizzare modified_fire_rate quando has_rapid_fire è true
+
+func get_powerup_id() -> String:
+	return POWERUP_ID

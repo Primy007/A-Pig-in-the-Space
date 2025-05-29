@@ -42,7 +42,10 @@ var health_bar: TextureProgressBar
 @export var current_health = 100
 
 # --- POWER-UPS ---
-var active_powerups = []
+# Usa un Dictionary per tracciare i power-up attivi per ID
+var active_powerups = {}
+var powerup_timers = {}  # Traccia i timer per ogni power-up
+
 # Multi-shot
 var has_multi_shot: bool = false
 var multi_shot_count: int = 2
@@ -50,6 +53,7 @@ var multi_shot_spread: float = 15.0
 # Shield
 var has_shield: bool = false
 var shield_health: int = 0
+
 # Variabili per altri power-up possono essere aggiunte qui
 
 # --- POWER-UP INDICATORS ---
@@ -104,7 +108,7 @@ func _handle_rotation(delta: float):
 
 func _handle_movement(delta: float):
 	# Update thrusting state based on spacebar input
-	is_thrusting = Input.is_action_pressed("ui_select")  # "ui_select" is spacebar by default
+	is_thrusting = Input.is_action_pressed("move_forward")  # "ui_select" is spacebar by default
 	
 	if is_thrusting:
 		# Move forward in the direction the ship is facing
@@ -209,10 +213,52 @@ func _fire_multi_shot():
 		get_tree().current_scene.add_child(right_bullet)
 		_apply_powerups_to_bullet(right_bullet)
 
+# Funzione per aggiungere un power-up
+func add_powerup(strategy: BasePowerUpStrategy) -> void:
+	var powerup_id = strategy.get_powerup_id()
+	
+	# Se il power-up è già attivo, rimuovi il vecchio timer
+	if active_powerups.has(powerup_id):
+		remove_powerup(powerup_id)
+	
+	# Applica il power-up
+	strategy.apply_to_player(self)
+	active_powerups[powerup_id] = strategy
+	
+	# Se ha durata limitata, crea il timer
+	if strategy.duration > 0:
+		var timer = Timer.new()
+		timer.wait_time = strategy.duration
+		timer.one_shot = true
+		timer.timeout.connect(_on_powerup_expired.bind(powerup_id))
+		get_tree().current_scene.add_child(timer)
+		powerup_timers[powerup_id] = timer
+		timer.start()
+
+# Funzione per rimuovere un power-up
+func remove_powerup(powerup_id: String) -> void:
+	if !active_powerups.has(powerup_id):
+		return
+		
+	var strategy = active_powerups[powerup_id]
+	strategy.remove_from_player(self)
+	active_powerups.erase(powerup_id)
+	
+	# Rimuovi il timer se esiste
+	if powerup_timers.has(powerup_id):
+		var timer = powerup_timers[powerup_id]
+		if is_instance_valid(timer):
+			timer.queue_free()
+		powerup_timers.erase(powerup_id)
+
+# Callback per quando un power-up scade
+func _on_powerup_expired(powerup_id: String) -> void:
+	remove_powerup(powerup_id)
+
+# Modifica la funzione _apply_powerups_to_bullet
 func _apply_powerups_to_bullet(bullet):
-	# Applica tutti i power-up attivi al proiettile
-	for powerup in active_powerups:
-		powerup.apply_to_bullet(bullet)
+	for strategy in active_powerups.values():
+		strategy.apply_to_bullet(bullet)
 
 func _show_shoot_effect():
 	sprite_shoot.visible = true

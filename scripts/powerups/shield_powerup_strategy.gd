@@ -4,6 +4,8 @@ extends BasePowerUpStrategy
 # Quantità di danno che lo scudo può assorbire
 @export var shield_amount: int = 50
 
+const POWERUP_ID = "shield"
+
 func apply_to_player(player: CharacterBody2D) -> void:
 	# Aggiungiamo uno scudo al giocatore
 	player.has_shield = true
@@ -22,3 +24,6 @@ func remove_from_player(player: CharacterBody2D) -> void:
 	# Nascondiamo l'effetto visivo
 	if player.has_node("ShieldEffect"):
 		player.get_node("ShieldEffect").visible = false
+
+func get_powerup_id() -> String:
+	return POWERUP_ID

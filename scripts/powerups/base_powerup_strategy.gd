@@ -22,3 +22,7 @@ func apply_to_player(player: CharacterBody2D) -> void:
 func remove_from_player(player: CharacterBody2D) -> void:
 	# Da implementare nelle classi derivate
 	pass
+
+# Metodo virtuale per ottenere l'ID del power-up
+func get_powerup_id() -> String:
+	return "base_powerup"
