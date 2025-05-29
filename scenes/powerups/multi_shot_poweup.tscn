@@ -3,13 +3,13 @@
 [ext_resource type="Script" path="res://scripts/powerup.gd" id="1_u8tsc"]
 [ext_resource type="Script" path="res://scripts/powerups/multi_shot_powerup_strategy.gd" id="2_l6sb1"]
 [ext_resource type="Texture2D" uid="uid://dw0rsp2u6aqkx" path="res://assets/images/powerups/multi_shot_powerup.png" id="3_a2f4c"]
-[ext_resource type="AudioStream" uid="uid://brtkdcw1cs26i" path="res://assets/audio/sfx/explosion/11L-generate_me_the_soun-1745792972469.mp3" id="3_xalit"]
 [ext_resource type="Material" uid="uid://b7u8g6ddusmsl" path="res://assets/texture/SmoothPixel_red.tres" id="4_g0by6"]
+[ext_resource type="AudioStream" uid="uid://cyxd12i06dqub" path="res://assets/audio/sfx/50-CC0-retro-synth-SFX/power_up_04.ogg" id="5_7uks1"]
 
 [sub_resource type="Resource" id="Resource_um4b8"]
 script = ExtResource("2_l6sb1")
-extra_bullets = 2
-spread_angle = 15.0
+extra_bullets = 1
+spread_angle = 5.0
 texture = ExtResource("3_a2f4c")
 upgrade_text = "Multiplier Seed"
 duration = 12.0
@@ -60,7 +60,7 @@ lifetime = 1.5
 one_shot = true
 
 [node name="PickupSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_xalit")
+stream = ExtResource("5_7uks1")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 

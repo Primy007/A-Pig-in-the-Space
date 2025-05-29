@@ -172,5 +172,7 @@ bus = &"sfx"
 
 [node name="FireLoopSFX" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("8_5j5lb")
+volume_db = -7.0
+bus = &"sfx"
 
 [connection signal="animation_finished" from="Fire_Sprite" to="." method="_on_fire_sprite_animation_finished"]

@@ -26,6 +26,7 @@ const HIT_SHAKE_DURATION: float = 0.2   # Durata più lunga per l'impatto
 @onready var animation_fire = $Fire_Sprite
 @onready var sprite_shoot = $Shoot_effect
 @onready var camera: Camera2D = $Camera2D
+@onready var fire_loop_sfx = $FireLoopSFX
 
 # --- STATE MANAGEMENT ---
 enum FireState { OFF, SPARK, FIRE_LOOP, STOP }
@@ -141,6 +142,8 @@ func _handle_stopping_animation():
 	if fire_state in [FireState.SPARK, FireState.FIRE_LOOP] && animation_fire.animation != "fire_stop":
 		animation_fire.play("fire_stop")
 		fire_state = FireState.STOP
+		# Ferma l'audio loop quando l'animazione si ferma
+		fire_loop_sfx.stop()
 
 func _handle_shooting():
 	if Input.is_action_pressed("fire") && can_shoot:
@@ -315,15 +318,20 @@ func die():
 	queue_free()  # O animazione di morte, esplosione, ecc.
 
 # --- SIGNAL HANDLERS ---
+# Modifica la funzione _on_fire_sprite_animation_finished
 func _on_fire_sprite_animation_finished():
 	match fire_state:
 		FireState.SPARK:
 			if _is_moving():
 				fire_state = FireState.FIRE_LOOP
 				animation_fire.play("fire_loop")
+				# Avvia l'audio loop quando inizia l'animazione loop
+				fire_loop_sfx.play()
 			else:
 				fire_state = FireState.STOP
 				animation_fire.play("fire_stop")
 		FireState.STOP:
 			$Fire_Sprite.visible = false
 			fire_state = FireState.OFF
+			# Assicurati che l'audio sia fermato quando l'animazione finisce completamente
+			fire_loop_sfx.stop()
