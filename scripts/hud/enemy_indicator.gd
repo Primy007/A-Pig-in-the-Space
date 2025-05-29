@@ -8,7 +8,8 @@ class_name EnemyIndicator
 
 # Configurazione
 @export var margin_from_edge: float = 50.0
-@export var update_frequency: float = 0.1  # Aggiorna ogni 0.1 secondi per performance
+@export var update_frequency: float = 0.016  # ~60 FPS per movimento fluido
+@export var icon_distance_behind_arrow: float = 40.0  # Distanza dell'icona dietro la freccia
 
 # Variabili interne
 var target_enemy: Node2D
@@ -127,11 +128,15 @@ func _world_to_screen_position(world_pos: Vector2, camera: Camera2D) -> Vector2:
 	return screen_center + relative_pos
 
 func _rotate_arrow_to_enemy():
-	"""Ruota la freccia per puntare verso il nemico"""
+	"""Ruota la freccia per puntare verso il nemico e posiziona l'icona dietro"""
 	var direction_to_enemy = (target_enemy.global_position - player.global_position).normalized()
 	arrow_sprite.rotation = direction_to_enemy.angle() + PI/2
+	
+	# Posiziona l'icona di allerta dietro la freccia (direzione opposta)
+	var behind_direction = -direction_to_enemy
+	alert_icon.position = behind_direction * icon_distance_behind_arrow
 
 func _update_distance():
 	"""Aggiorna il testo della distanza"""
-	var distance = player.global_position.distance_to(target_enemy.global_position)
+	var distance = player.global_position.distance_to(target_enemy.global_position)-500
 	distance_label.text = str(int(distance)) + "m"

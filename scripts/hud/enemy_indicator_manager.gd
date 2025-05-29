@@ -14,8 +14,8 @@ var active_indicators: Dictionary = {}
 var check_timer: float = 0.0
 
 func _ready():
-	# Assicurati che questo CanvasLayer sia sopra gli altri
-	layer = 100
+	# Metti questo layer dietro gli altri elementi dell'HUD
+	layer = 1
 
 func _process(delta):
 	check_timer += delta
