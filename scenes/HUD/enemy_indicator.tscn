@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bv5can7ganyd7" path="res://assets/images/HUD/icons/alert_icon.png" id="3"]
 
 [node name="EnemyIndicator" type="Control"]
+z_index = -1
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1")

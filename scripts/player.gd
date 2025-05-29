@@ -278,13 +278,22 @@ func take_damage(damage):
 	# Se il giocatore ha lo scudo, il danno viene assorbito prima
 	if has_shield and shield_health > 0:
 		shield_health -= damage
+		
+		# Se lo scudo è stato distrutto dal danno
 		if shield_health <= 0:
-			has_shield = false
-			# Disattiva effetto visivo dello scudo
-			if has_node("ShieldEffect"):
-				get_node("ShieldEffect").visible = false
+			# Rimuovi il power-up dello scudo (questo farà sparire l'effetto visivo)
+			remove_powerup("shield")
+			
+			# Se c'è danno residuo, applicalo alla salute
+			var excess_damage = -shield_health
+			if excess_damage > 0:
+				current_health -= excess_damage
+				current_health = clamp(current_health, 0, max_health)
+				update_health_bar()
+				apply_screen_shake(HIT_SHAKE_STRENGTH, HIT_SHAKE_DURATION)
 		return
 	
+	# Danno normale se non c'è scudo
 	current_health -= damage
 	current_health = clamp(current_health, 0, max_health)
 	update_health_bar()

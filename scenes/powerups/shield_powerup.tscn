@@ -10,6 +10,10 @@
 [sub_resource type="Resource" id="Resource_hurbo"]
 script = ExtResource("2_llh84")
 shield_amount = 50
+shield_texture = ExtResource("6_nqs5r")
+blink_speed = 1.5
+min_alpha = 0.3
+max_alpha = 1.0
 texture = ExtResource("3_6y6ca")
 upgrade_text = "Shield Beetle"
 duration = 12.0
@@ -67,10 +71,6 @@ stream = ExtResource("3_ll5yl")
 
 [node name="Timer" type="Timer" parent="VisibleOnScreenNotifier2D"]
 wait_time = 10.0
-
-[node name="Shield" type="Sprite2D" parent="."]
-visible = false
-texture = ExtResource("6_nqs5r")
 
 [connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_entered"]
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
