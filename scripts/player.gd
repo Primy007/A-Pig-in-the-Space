@@ -46,6 +46,10 @@ var health_bar: TextureProgressBar
 var active_powerups = {}
 var powerup_timers = {}  # Traccia i timer per ogni power-up
 
+# --- RAPID FIRE POWER-UP ---
+var has_rapid_fire: bool = false
+var modified_fire_rate: float = FIRE_RATE
+
 # Multi-shot
 var has_multi_shot: bool = false
 var multi_shot_count: int = 2
@@ -143,11 +147,9 @@ func _handle_shooting():
 		shoot()
 		can_shoot = false
 		
-		# CORREZIONE: Usa fire rate modificata se disponibile
-		var current_fire_rate = FIRE_RATE
-		if get("has_rapid_fire") and get("modified_fire_rate"):
-			current_fire_rate = get("modified_fire_rate")
-			
+		# Usa direttamente la variabile
+		var current_fire_rate = modified_fire_rate if has_rapid_fire else FIRE_RATE
+		
 		await get_tree().create_timer(current_fire_rate).timeout
 		can_shoot = true
 

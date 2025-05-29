@@ -1,32 +1,26 @@
 class_name RapidFirePowerUpStrategy
 extends BasePowerUpStrategy
 
-# Riduzione del cooldown tra i colpi
 @export var fire_rate_boost_percentage: float = 50.0
-
-# Riferimento al valore originale della fire rate
-var original_fire_rate: float
 
 const POWERUP_ID = "rapid_fire"
 
 func apply_to_player(player: CharacterBody2D) -> void:
-	# CORREZIONE: Salva il valore originale usando una proprietà dinamica
-	# dato che FIRE_RATE è una costante
-	original_fire_rate = player.FIRE_RATE
+	# Attiva il rapid fire
+	player.has_rapid_fire = true
 	
-	# Crea una proprietà dinamica per la fire rate modificata
-	player.set("modified_fire_rate", original_fire_rate * (1 - fire_rate_boost_percentage / 100))
+	# Calcola il nuovo fire rate (più basso = più veloce)
+	var boost_multiplier = (100 - fire_rate_boost_percentage) / 100.0
+	player.modified_fire_rate = player.FIRE_RATE * boost_multiplier
 	
-	# Imposta un flag per indicare che la fire rate è modificata
-	player.set("has_rapid_fire", true)
+	print("Rapid Fire attivato! Fire rate: ", player.modified_fire_rate)
 
 func remove_from_player(player: CharacterBody2D) -> void:
-	# Rimuovi le proprietà dinamiche
-	player.set("has_rapid_fire", false)
-	if player.has_method("remove_meta"):
-		player.remove_meta("modified_fire_rate")
-
-# NOTA: Il player.gd dovrà essere modificato per utilizzare modified_fire_rate quando has_rapid_fire è true
+	# Disattiva il rapid fire
+	player.has_rapid_fire = false
+	player.modified_fire_rate = player.FIRE_RATE
+	
+	print("Rapid Fire disattivato!")
 
 func get_powerup_id() -> String:
 	return POWERUP_ID

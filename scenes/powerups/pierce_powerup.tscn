@@ -11,7 +11,7 @@ script = ExtResource("2_quk68")
 additional_pierce = 2
 texture = ExtResource("4_gmeen")
 upgrade_text = "Piercing Flower"
-duration = 10.0
+duration = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kwoy"]
 radius = 25.0

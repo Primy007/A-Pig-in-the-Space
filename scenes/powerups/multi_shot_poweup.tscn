@@ -12,7 +12,7 @@ extra_bullets = 2
 spread_angle = 15.0
 texture = ExtResource("3_a2f4c")
 upgrade_text = "Multiplier Seed"
-duration = 4.0
+duration = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kwoy"]
 radius = 25.0

@@ -11,7 +11,7 @@ script = ExtResource("2_crpbh")
 damage_increase = 20
 texture = ExtResource("3_hegjw")
 upgrade_text = "Damage Artefact"
-duration = 10.0
+duration = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kwoy"]
 radius = 25.0

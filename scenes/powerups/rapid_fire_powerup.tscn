@@ -8,10 +8,10 @@
 
 [sub_resource type="Resource" id="Resource_p3sy1"]
 script = ExtResource("3_pq6qp")
-fire_rate_boost_percentage = 600.0
+fire_rate_boost_percentage = 50.0
 texture = ExtResource("4_6vatr")
 upgrade_text = "Steroids"
-duration = 10.0
+duration = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kwoy"]
 radius = 25.0
