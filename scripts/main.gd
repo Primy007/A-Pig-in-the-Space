@@ -18,17 +18,24 @@ func _setup_managers():
 	var filetext_indicator_manager = preload("res://scenes/HUD/filetext_indicator_manager.tscn").instantiate()
 	add_child(filetext_indicator_manager)
 	
-	# Aggiungi il Wave Manager
-	wave_manager = preload("res://scripts/wave_manager.gd").new()
+# Usa la scena invece dello script
+	wave_manager = preload("res://scenes/wave_manager.tscn").instantiate()
 	add_child(wave_manager)
 
 func _setup_wave_system():
 	"""Configura il sistema delle ondate"""
 	if wave_manager:
-		# Configura le scene dei nemici (modifica i path secondo la tua struttura)
+		# Ora funziona perché è una scena istanziata
 		wave_manager.enemy_scenes = [
+			preload("res://scenes/enemy_fly.tscn")
+		]
+		
+		# CORREZIONE: Usa una funzione del wave_manager per configurare le scene nemici
+		# invece di assegnare direttamente alla proprietà @export
+		var enemy_scene_paths = [
 			preload("res://scenes/enemy_fly.tscn")  # Aggiungi altre scene nemici qui
 		]
+		wave_manager.set_enemy_scenes(enemy_scene_paths)
 		
 		# Crea punti di spawn attorno all'area di gioco
 		wave_manager.setup_spawn_points_around_player(1200.0, 8)

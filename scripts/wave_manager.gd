@@ -10,7 +10,8 @@ signal enemy_spawned(enemy)
 # Configurazione delle ondate
 @export var wave_configurations: Array[WaveConfig] = []
 @export var spawn_points: Array[Marker2D] = []
-@export var enemy_scenes: Array[PackedScene] = []
+# CORREZIONE: Inizializza esplicitamente l'array per evitare problemi di tipo
+var enemy_scenes: Array[PackedScene] = []
 
 # Stato corrente
 var current_wave: int = 0
@@ -85,6 +86,24 @@ func _connect_to_filetexts():
 # =============================================================================
 # FUNZIONI PUBBLICHE
 # =============================================================================
+
+func set_enemy_scenes(scenes: Array):
+	"""Imposta le scene dei nemici - CORREZIONE per evitare l'errore @export"""
+	enemy_scenes.clear()
+	for scene in scenes:
+		if scene is PackedScene:
+			enemy_scenes.append(scene)
+	print("[WaveManager] Scene nemici configurate: ", enemy_scenes.size())
+
+func add_enemy_scene(scene: PackedScene):
+	"""Aggiunge una singola scena nemico"""
+	if scene and scene is PackedScene:
+		enemy_scenes.append(scene)
+		print("[WaveManager] Scena nemico aggiunta: ", scene.resource_path)
+
+func clear_enemy_scenes():
+	"""Svuota l'array delle scene nemici"""
+	enemy_scenes.clear()
 
 func start_wave_system():
 	"""Inizia il sistema delle ondate"""

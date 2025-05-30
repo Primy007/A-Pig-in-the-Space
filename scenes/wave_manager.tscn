@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://e8our4g1vcww"]
+[gd_scene load_steps=3 format=3 uid="uid://e8our4g1vcww"]
 
 [ext_resource type="Script" path="res://scripts/wave_manager.gd" id="1_4yogn"]
+[ext_resource type="PackedScene" uid="uid://jo02i8tp7axw" path="res://scenes/enemy_fly.tscn" id="2_pfplr"]
 
-[node name="Node" type="Node"]
+[node name="WaveManager" type="Node"]
 script = ExtResource("1_4yogn")
+enemy_scenes = Array[PackedScene]([ExtResource("2_pfplr")])
