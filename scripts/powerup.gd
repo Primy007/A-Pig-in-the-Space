@@ -79,11 +79,21 @@ func _cleanup_powerup():
 	queue_free()
 
 func apply_powerup(player):
-	if !power_up_strategy:
+	if not power_up_strategy:
+		print("ERRORE: Power-up strategy non assegnata")
 		return
 		
-	# Usa il nuovo sistema del player
+	if not player or not is_instance_valid(player):
+		print("ERRORE: Player non valido per power-up")
+		return
+		
+	if not player.has_method("add_powerup"):
+		print("ERRORE: Player non ha il metodo add_powerup")
+		return
+	
+	# Applica il power-up
 	player.add_powerup(power_up_strategy)
+	print("Power-up applicato: ", power_up_strategy.get_powerup_id())
 
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	$VisibleOnScreenNotifier2D/Timer.start()

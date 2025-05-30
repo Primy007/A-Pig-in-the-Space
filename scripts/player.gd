@@ -61,7 +61,7 @@ var shield_health: int = 0
 # Variabili per altri power-up possono essere aggiunte qui
 
 # --- POWER-UP INDICATORS ---
-@onready var powerup_icons_container = $PowerupIconsContainer
+#@onready var powerup_icons_container = $PowerupIconsContainer
 
 # --- GAME MANAGER REFERENCE ---
 var game_manager: Node
@@ -227,25 +227,38 @@ func _fire_multi_shot():
 
 # Funzione per aggiungere un power-up
 func add_powerup(strategy: BasePowerUpStrategy) -> void:
+	if not strategy:
+		print("ERRORE: Strategy power-up null")
+		return
+		
 	var powerup_id = strategy.get_powerup_id()
 	
-	# Se il power-up è già attivo, rimuovi il vecchio timer
+	# Controllo se il power-up è già attivo
 	if active_powerups.has(powerup_id):
 		remove_powerup(powerup_id)
 	
-	# Applica il power-up
-	strategy.apply_to_player(self)
-	active_powerups[powerup_id] = strategy
-	
-	# Se ha durata limitata, crea il timer
-	if strategy.duration > 0:
-		var timer = Timer.new()
-		timer.wait_time = strategy.duration
-		timer.one_shot = true
-		timer.timeout.connect(_on_powerup_expired.bind(powerup_id))
-		get_tree().current_scene.add_child(timer)
-		powerup_timers[powerup_id] = timer
-		timer.start()
+	# Applica il power-up con controllo errori
+	if strategy.has_method("apply_to_player"):
+		strategy.apply_to_player(self)
+		active_powerups[powerup_id] = strategy
+		
+		# Timer solo se durata > 0
+		if strategy.duration > 0:
+			var timer = Timer.new()
+			timer.wait_time = strategy.duration
+			timer.one_shot = true
+			timer.timeout.connect(_on_powerup_expired.bind(powerup_id))
+			
+			# Aggiunge il timer alla scena invece che al player
+			if get_tree().current_scene:
+				get_tree().current_scene.add_child(timer)
+				powerup_timers[powerup_id] = timer
+				timer.start()
+			else:
+				print("ERRORE: Impossibile aggiungere timer power-up")
+	else:
+		print("ERRORE: Strategy non ha il metodo apply_to_player")
+
 
 # Funzione per rimuovere un power-up
 func remove_powerup(powerup_id: String) -> void:
@@ -319,17 +332,16 @@ func take_damage(damage):
 		_handle_dead()
 
 func _handle_dead():
-	# Ferma tutti i timer attivi dei power-up
-	for timer in powerup_timers.values():
-		if is_instance_valid(timer):
-			timer.queue_free()
-	powerup_timers.clear()
-	active_powerups.clear()
+	# Pulisci i power-up in modo più sicuro
+	for powerup_id in active_powerups.keys():
+		remove_powerup(powerup_id)
 	
-	# Notifica il GameManager della morte del player (usando l'autoload)
-	GameManager.on_player_died()
+	# Notifica GameManager usando l'autoload
+	if has_node("/root/GameManager"):
+		GameManager.on_player_died()
+	else:
+		print("ERRORE: GameManager autoload non trovato")
 	
-	# Animazione di morte
 	_play_death_animation()
 
 func _play_death_animation():

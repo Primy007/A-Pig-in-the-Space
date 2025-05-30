@@ -1,5 +1,9 @@
 # game_manager.gd - VERSIONE CORRETTA
 extends Node
+# Aggiungi all'inizio del file, dopo extends Node:
+func _init():
+	print("GameManager autoload inizializzato")
+	name = "GameManager"  # Assicura il nome corretto
 
 # --- SPAWN SETTINGS ---
 @export var enemy_scene: PackedScene
@@ -27,19 +31,26 @@ signal player_died
 func _ready():
 	print("GameManager ready (Autoload)")
 	
-	# Carica la scena del nemico se non è assegnata
+	# Carica la scena del nemico con gestione errori
 	if not enemy_scene:
-		enemy_scene = preload("res://scenes/enemy_fly.tscn")
+		var enemy_path = "res://scenes/enemy_fly.tscn"
+		if ResourceLoader.exists(enemy_path):
+			enemy_scene = load(enemy_path)
+			print("Enemy scene caricata: ", enemy_scene != null)
+		else:
+			print("ERRORE: File enemy_fly.tscn non trovato in ", enemy_path)
 	
 	_setup_spawn_timer()
 	_connect_signals()
-	
-	# Aspetta un frame per permettere alla scena di caricarsi completamente
 	call_deferred("_delayed_start")
 
 func _delayed_start():
-	# Non iniziare automaticamente - aspetta che il player sia pronto
-	pass
+	print("GameManager _delayed_start chiamato")
+	# Verifica che tutto sia pronto
+	if get_tree() and get_tree().current_scene:
+		print("Scena corrente disponibile: ", get_tree().current_scene.name)
+	else:
+		print("ERRORE: Scena corrente non disponibile")
 
 func _setup_spawn_timer():
 	spawn_timer = Timer.new()
@@ -57,10 +68,8 @@ func start_game():
 	current_score = 0
 	score_changed.emit(current_score)
 	
-	# Aspetta un momento prima di cercare il player
 	await get_tree().process_frame
 	
-	# Trova il player
 	player = get_tree().get_first_node_in_group("player")
 	if not player:
 		print("ERRORE: Player non trovato nel gruppo 'player'!")
@@ -68,11 +77,18 @@ func start_game():
 	
 	print("Player trovato: ", player.name)
 	
-	if spawn_timer:
-		spawn_timer.start()
-		print("Timer di spawn avviato")
-	
-	print("Gioco avviato con successo")
+	# Validazione più robusta del timer
+	if spawn_timer and is_instance_valid(spawn_timer):
+		if spawn_timer.is_stopped():
+			spawn_timer.start()
+			print("Timer di spawn avviato")
+		else:
+			print("Timer già attivo")
+	else:
+		print("ERRORE: Timer di spawn non valido!")
+		_setup_spawn_timer()  # Ricrea il timer
+		if spawn_timer:
+			spawn_timer.start()
 
 func stop_game():
 	print("Fermando il gioco")
@@ -81,25 +97,39 @@ func stop_game():
 		spawn_timer.stop()
 
 func _spawn_enemy():
-	if not game_active or not is_instance_valid(player) or not enemy_scene:
-		print("Impossibile spawnare nemico: game_active=", game_active, ", player_valid=", is_instance_valid(player), ", enemy_scene=", enemy_scene != null)
+	if not game_active:
+		print("Game non attivo, saltando spawn")
+		return
+		
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player")
+		if not player:
+			print("Player non trovato per spawn nemico")
+			return
+	
+	if not enemy_scene:
+		print("Enemy scene non disponibile")
 		return
 	
 	var spawn_position = _get_random_spawn_position()
 	if spawn_position == Vector2.ZERO:
-		print("Posizione di spawn non valida")
+		print("Posizione spawn non valida")
 		return
 	
 	var enemy = enemy_scene.instantiate()
+	if not enemy:
+		print("Errore nell'istanziare il nemico")
+		return
+		
 	enemy.global_position = spawn_position
 	
-	# Aggiungi alla scena corrente
 	var scene_root = get_tree().current_scene
 	if scene_root:
-		scene_root.add_child(enemy)
+		scene_root.call_deferred("add_child", enemy)
 		print("Nemico spawnato in posizione: ", spawn_position)
 	else:
-		print("ERRORE: Scena corrente non trovata")
+		print("ERRORE: Scena corrente non trovata per spawn")
+		enemy.queue_free()
 
 func _get_random_spawn_position() -> Vector2:
 	if not player:
@@ -120,24 +150,12 @@ func _get_random_spawn_position() -> Vector2:
 	return player_pos + Vector2(min_spawn_distance, 0).rotated(randf() * 2 * PI)
 
 func _is_valid_spawn_position(pos: Vector2) -> bool:
-	var viewport = get_viewport()
-	if not viewport:
-		return true
-		
-	var camera = viewport.get_camera_2d()
-	if not camera:
-		return true
+	# Versione semplificata per evitare problemi nell'export
+	if not player:
+		return false
 	
-	var viewport_rect = viewport.get_visible_rect()
-	var camera_pos = camera.global_position
-	var screen_size = viewport_rect.size / camera.zoom
-	
-	var left_bound = camera_pos.x - screen_size.x / 2 - spawn_margin
-	var right_bound = camera_pos.x + screen_size.x / 2 + spawn_margin
-	var top_bound = camera_pos.y - screen_size.y / 2 - spawn_margin
-	var bottom_bound = camera_pos.y + screen_size.y / 2 + spawn_margin
-	
-	return pos.x < left_bound or pos.x > right_bound or pos.y < top_bound or pos.y > bottom_bound
+	var distance_to_player = pos.distance_to(player.global_position)
+	return distance_to_player >= min_spawn_distance and distance_to_player <= max_spawn_distance
 
 func add_score(points: int):
 	if not game_active:

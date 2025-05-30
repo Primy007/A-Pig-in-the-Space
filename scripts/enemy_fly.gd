@@ -32,11 +32,6 @@ func _ready():
 	animation_flying.play("Normal")
 	_validate_setup()
 	update_health_bar()
-	
-	# Trova il GameManager
-	game_manager = get_node("/root/GameManager") if has_node("/root/GameManager") else null
-	
-	# Aggiungi al gruppo nemici
 	add_to_group("enemies")
 
 func _process(delta):
@@ -118,13 +113,11 @@ func _handle_dead():
 	collision_mask = 0
 	health_bar.visible = false
 	
-	# Notifica il GameManager per aggiornare il punteggio
-	if game_manager:
-		game_manager.add_score(game_manager.points_per_enemy)
+	# Usa direttamente GameManager (autoload)
+	if GameManager:
+		GameManager.add_score(GameManager.points_per_enemy)
 	
-	# CORREZIONE: Usa call_deferred per evitare l'errore di collision query
 	call_deferred("_try_drop_powerup")
-	
 	$DeathSFX.play()
 	animation_flying.play("Explosion")
 	await animation_flying.animation_finished
