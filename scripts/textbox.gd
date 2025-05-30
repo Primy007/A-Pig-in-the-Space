@@ -54,22 +54,33 @@ signal dialogue_line_finished
 func _ready():
 	add_to_group("textbox")
 	print("starting state: READY")
-	hide_textbox()
-	timer.connect("timeout", Callable(self, "_on_Timer_timeout"))
 	
-	# Setup dei timer
+	# ✅ PRIMA controlla che il timer esista
+	if timer:
+		timer.connect("timeout", Callable(self, "_on_Timer_timeout"))
+	
+	# Setup dei timer DOPO che tutti i nodi sono pronti
+	_setup_custom_timers()
+	
+	# Nascondi la textbox all'inizio
+	hide_textbox()
+	
+	# ESEMPI DI DIALOGHI (chiamali dopo che tutto è inizializzato)
+	call_deferred("_setup_example_dialogues")
+
+func _setup_custom_timers():
+	"""Setup sicuro dei timer personalizzati"""
+	# Setup delay timer
 	delay_timer = Timer.new()
 	delay_timer.one_shot = true
 	delay_timer.timeout.connect(_start_current_dialogue)
 	add_child(delay_timer)
 	
+	# Setup auto advance timer
 	auto_advance_timer = Timer.new()
 	auto_advance_timer.one_shot = true
 	auto_advance_timer.timeout.connect(_auto_advance_dialogue)
 	add_child(auto_advance_timer)
-	
-	# ESEMPI DI DIALOGHI
-	_setup_example_dialogues()
 
 func _setup_example_dialogues():
 	"""Esempi di come usare il sistema di dialoghi"""
@@ -98,13 +109,14 @@ func _process(delta):
 				_process_next_dialogue()
 		State.READING:
 			if Input.is_action_just_pressed("proceed"):
-				timer.stop()
+				if timer:  # ✅ Controlla che il timer esista
+					timer.stop()
 				label.text = full_text
 				end.text = "v"
 				change_state(State.FINISHED)
 		State.FINISHED:
 			if Input.is_action_just_pressed("proceed") or (current_dialogue and current_dialogue.auto_advance):
-				if current_dialogue and current_dialogue.auto_advance:
+				if current_dialogue and current_dialogue.auto_advance and auto_advance_timer:
 					auto_advance_timer.stop()
 				_advance_dialogue()
 
@@ -145,7 +157,7 @@ func _process_next_dialogue():
 	
 	current_dialogue = dialogue_queue.pop_front()
 	
-	if current_dialogue.delay_before > 0:
+	if current_dialogue.delay_before > 0 and delay_timer:
 		delay_timer.wait_time = current_dialogue.delay_before
 		delay_timer.start()
 	else:
@@ -160,27 +172,38 @@ func _start_current_dialogue():
 	_setup_speaker_visuals(current_dialogue.speaker)
 	change_state(State.READING)
 	show_textbox()
-	timer.start()
+	
+	# ✅ Controlla che il timer esista prima di avviarlo
+	if timer:
+		timer.start()
 	
 	dialogue_started.emit()
 
 func _setup_speaker_visuals(speaker: Speaker):
 	"""Configura le texture in base al parlante"""
-	# Nascondi tutto prima
-	player_texture.hide()
-	captain_texture.hide()
+	# ✅ Controlla che le texture esistano prima di nasconderle
+	if player_texture:
+		player_texture.hide()
+	if captain_texture:
+		captain_texture.hide()
 	
 	match speaker:
 		Speaker.PLAYER:
-			player_texture.show()
-			start.text = "PLAYER:"
+			if player_texture:
+				player_texture.show()
+			if start:
+				start.text = "PLAYER:"
 		Speaker.CAPTAIN:
-			captain_texture.show()
-			start.text = "CAPTAIN:"
+			if captain_texture:
+				captain_texture.show()
+			if start:
+				start.text = "CAPTAIN:"
 		Speaker.NARRATOR:
-			start.text = "NARRATOR:"
+			if start:
+				start.text = "NARRATOR:"
 		Speaker.SYSTEM:
-			start.text = "SYSTEM:"
+			if start:
+				start.text = "SYSTEM:"
 
 func _advance_dialogue():
 	"""Avanza al prossimo dialogo o chiude la textbox"""
@@ -198,32 +221,48 @@ func _auto_advance_dialogue():
 	_advance_dialogue()
 
 func hide_textbox():
-	start.text = ""
-	end.text = ""
-	label.text = ""
-	textbox_container.hide()
-	timer.stop()
-	auto_advance_timer.stop()
+	# ✅ Controlla che tutti i nodi esistano prima di usarli
+	if start:
+		start.text = ""
+	if end:
+		end.text = ""
+	if label:
+		label.text = ""
+	if textbox_container:
+		textbox_container.hide()
 	
-	player_texture.hide()
-	captain_texture.hide()
+	# ✅ Controlla che i timer esistano prima di fermarli
+	if timer:
+		timer.stop()
+	if auto_advance_timer:
+		auto_advance_timer.stop()
+	
+	if player_texture:
+		player_texture.hide()
+	if captain_texture:
+		captain_texture.hide()
 
 func show_textbox():
-	end.text = ""
-	textbox_container.show()
+	if end:
+		end.text = ""
+	if textbox_container:
+		textbox_container.show()
 
 func _on_Timer_timeout():
 	if current_index < full_text.length():
-		label.text += full_text[current_index]
+		if label:
+			label.text += full_text[current_index]
 		current_index += 1
 	else:
 		# Testo completato
-		end.text = "v"
-		timer.stop()
+		if end:
+			end.text = "v"
+		if timer:
+			timer.stop()
 		change_state(State.FINISHED)
 		
 		# Se è auto-advance, avvia il timer
-		if current_dialogue and current_dialogue.auto_advance:
+		if current_dialogue and current_dialogue.auto_advance and auto_advance_timer:
 			auto_advance_timer.wait_time = current_dialogue.auto_advance_time
 			auto_advance_timer.start()
 
@@ -250,7 +289,10 @@ func is_dialogue_active() -> bool:
 func skip_current_dialogue():
 	"""Salta il dialogo corrente (utile per debug)"""
 	if current_state == State.READING:
-		timer.stop()
-		label.text = full_text
-		end.text = "v"
+		if timer:
+			timer.stop()
+		if label:
+			label.text = full_text
+		if end:
+			end.text = "v"
 		change_state(State.FINISHED)

@@ -42,20 +42,24 @@ theme_override_constants/margin_bottom = 68
 visible = false
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TextboxContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextboxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="Start" type="Label" parent="TextboxContainer/MarginContainer/HBoxContainer"]
+[node name="Start" type="Label" parent="TextboxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_font_sizes/font_size = 17
 text = "*"
 
-[node name="Label" type="Label" parent="TextboxContainer/MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(338, 130)
+[node name="HBoxContainer" type="HBoxContainer" parent="TextboxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="TextboxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(353, 106)
+layout_mode = 2
+size_flags_vertical = 1
 theme_override_fonts/font = ExtResource("2_77ubd")
 theme_override_font_sizes/font_size = 17
 text = "Heyy i'm so fucking gay really really really gay, Oh.... I'm really gay fuck."
@@ -63,7 +67,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 clip_text = true
 
-[node name="End" type="Label" parent="TextboxContainer/MarginContainer/HBoxContainer"]
+[node name="End" type="Label" parent="TextboxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
