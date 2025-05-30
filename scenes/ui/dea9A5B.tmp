@@ -26,7 +26,6 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.717647)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control"]
-process_mode = 3
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -58,7 +57,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ButtonContainer" type="HBoxContainer" parent="Control/VBoxContainer"]
-process_mode = 3
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

@@ -64,7 +64,22 @@ position = Vector2(-254, -408)
 position = Vector2(1428, -416)
 
 [node name="Enemy_Fly" parent="." instance=ExtResource("5_mw37l")]
-position = Vector2(-454, 656)
+position = Vector2(-171, 735)
+
+[node name="Enemy_Fly8" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-799, 582)
+
+[node name="Enemy_Fly4" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-397, 933)
+
+[node name="Enemy_Fly7" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(262, 568)
+
+[node name="Enemy_Fly5" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-601, 220)
+
+[node name="Enemy_Fly6" parent="." instance=ExtResource("5_mw37l")]
+position = Vector2(-383, 274)
 
 [node name="Enemy_Fly3" parent="." instance=ExtResource("5_mw37l")]
 position = Vector2(-3272, -2243)
