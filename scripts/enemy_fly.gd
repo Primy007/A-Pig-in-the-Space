@@ -1,3 +1,4 @@
+# enemy_fly.gd - VERSIONE AGGIORNATA
 extends CharacterBody2D
 
 var is_dying: bool = false
@@ -24,10 +25,19 @@ var is_dying: bool = false
 @onready var player = get_tree().get_first_node_in_group("player")
 @onready var health_bar = $HealthBar
 
+# --- Game Manager Reference ---
+var game_manager: Node
+
 func _ready():
 	animation_flying.play("Normal")
 	_validate_setup()
 	update_health_bar()
+	
+	# Trova il GameManager
+	game_manager = get_node("/root/GameManager") if has_node("/root/GameManager") else null
+	
+	# Aggiungi al gruppo nemici
+	add_to_group("enemies")
 
 func _process(delta):
 	var offset = Vector2(-55, -80)
@@ -107,6 +117,10 @@ func _handle_dead():
 	collision_layer = 0
 	collision_mask = 0
 	health_bar.visible = false
+	
+	# Notifica il GameManager per aggiornare il punteggio
+	if game_manager:
+		game_manager.add_score(game_manager.points_per_enemy)
 	
 	# CORREZIONE: Usa call_deferred per evitare l'errore di collision query
 	call_deferred("_try_drop_powerup")

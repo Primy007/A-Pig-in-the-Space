@@ -1,3 +1,4 @@
+# player.gd - VERSIONE AGGIORNATA
 extends CharacterBody2D
 
 # --- CONSTANTS ---
@@ -62,6 +63,9 @@ var shield_health: int = 0
 # --- POWER-UP INDICATORS ---
 @onready var powerup_icons_container = $PowerupIconsContainer
 
+# --- GAME MANAGER REFERENCE ---
+var game_manager: Node
+
 func _ready():
 	_setup_camera()
 	_reset_visuals()
@@ -77,8 +81,18 @@ func _ready():
 	
 	# Inizializza il gruppo del player
 	add_to_group("player")
+	
+	# Trova il GameManager
+	game_manager = get_node("/root/GameManager") if has_node("/root/GameManager") else null
+	
+	# Avvia il gioco se il GameManager esiste
+	if game_manager:
+		game_manager.start_game()
 
 func _physics_process(delta):
+	if is_dying:
+		return
+		
 	_handle_rotation(delta)
 	_handle_movement(delta)
 	_update_fire_animation()
@@ -276,6 +290,9 @@ func apply_screen_shake(strength: float, duration: float):
 	camera.offset = original_camera_offset
 
 func take_damage(damage):
+	if is_dying:
+		return
+		
 	# Se il giocatore ha lo scudo, il danno viene assorbito prima
 	if has_shield and shield_health > 0:
 		shield_health -= damage
@@ -307,13 +324,51 @@ func take_damage(damage):
 		_handle_dead()
 
 func _handle_dead():
-	die()
+	# Ferma tutti i timer attivi dei power-up
+	for timer in powerup_timers.values():
+		if is_instance_valid(timer):
+			timer.queue_free()
+	powerup_timers.clear()
+	active_powerups.clear()
+	
+	# Notifica il GameManager della morte del player
+	if game_manager:
+		game_manager.on_player_died()
+	
+	# Animazione di morte
+	_play_death_animation()
+
+func _play_death_animation():
+	# Disabilita controlli
+	set_physics_process(false)
+	
+	# Rimuovi dai gruppi
+	remove_from_group("player")
+	
+	# Ferma le animazioni attuali
+	animation_flying.stop()
+	animation_fire.stop()
+	fire_loop_sfx.stop()
+	
+	# Animazione di esplosione/morte
+	#if animation_flying.has_animation("Explosion"):
+		#animation_flying.play("Explosion")
+		#await animation_flying.animation_finished
+	#else:
+		# Animazione di fade out se non c'è animazione di esplosione
+		#var tween = create_tween()
+		#tween.tween_property(self, "modulate:a", 0.0, 1.0)
+		#await tween.finished
+	
+	# Non eliminare il player immediatamente - la morte screen gestisce il restart
+	visible = false
 
 func update_health_bar():
-	health_bar.value = current_health
+	if health_bar:
+		health_bar.value = current_health
 
 func die():
-	queue_free()  # O animazione di morte, esplosione, ecc.
+	queue_free()
 
 # --- SIGNAL HANDLERS ---
 # Modifica la funzione _on_fire_sprite_animation_finished
