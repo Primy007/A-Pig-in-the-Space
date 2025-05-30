@@ -6,7 +6,7 @@ class_name FileText
 @export var collected: bool = false
 
 # Segnali
-signal file_collected(filetext: FileText)
+signal file_collected(content: String)  # ✅ Cambiato per passare solo il contenuto
 
 # Riferimenti ai nodi
 @onready var sprite: Sprite2D = $Sprite2D
@@ -38,10 +38,14 @@ func collect():
 	# Emetti il segnale con il contenuto del testo
 	file_collected.emit(text_content)
 	
-	# Ottieni il textbox dal tree e aggiungi il testo
+	# ✅ SOLUZIONE SEMPLICE: Usa direttamente la textbox con le funzioni corrette
 	var textbox = get_tree().get_first_node_in_group("textbox")
 	if textbox:
-		textbox.queue_text(text_content)
+		# Mostra un messaggio di sistema per il file raccolto
+		textbox.add_system_message("File raccolto: " + text_content)
+		
+		# Oppure mostra il contenuto come dialogo del narratore
+		# textbox.add_dialogue(text_content, textbox.Speaker.NARRATOR)
 	
 	# Nascondi o rimuovi l'oggetto
 	queue_free()

@@ -1,298 +1,388 @@
-# textbox.gd - Sistema di dialoghi migliorato
+# textbox.gd - Sistema di dialoghi ottimizzato e sicuro
 extends CanvasLayer
 
+# Nodi della UI
 @onready var textbox_container: MarginContainer = $TextboxContainer
-@onready var start: Label = $TextboxContainer/MarginContainer/HBoxContainer/Start
-@onready var end: Label = $TextboxContainer/MarginContainer/HBoxContainer/End
-@onready var label: Label = $TextboxContainer/MarginContainer/HBoxContainer/Label
-@onready var timer: Timer = $Timer
+@onready var start_label: Label = $TextboxContainer/MarginContainer/VBoxContainer/Start
+@onready var end_label: Label = $TextboxContainer/MarginContainer/VBoxContainer/HBoxContainer/End
+@onready var text_label: Label = $TextboxContainer/MarginContainer/VBoxContainer/HBoxContainer/Label
+@onready var typing_timer: Timer = $Timer
 @onready var player_texture: TextureRect = $PlayerTexture
 @onready var captain_texture: TextureRect = $CaptainTexture
 
-var full_text: String = ""
-var current_index: int = 0
+# Timer personalizzati (creati dinamicamente)
+var delay_timer: Timer
+var auto_advance_timer: Timer
 
-enum State {
-	READY,
-	READING,
-	FINISHED
+# Variabili del testo
+var full_text: String = ""
+var current_char_index: int = 0
+var typing_speed: float = 0.05
+
+# Stati e controllo
+enum DialogueState {
+	IDLE,
+	TYPING,
+	WAITING_FOR_INPUT,
+	PROCESSING_QUEUE
 }
 
-enum Speaker {
+enum SpeakerType {
 	PLAYER,
-	CAPTAIN,
+	CAPTAIN, 
 	NARRATOR,
 	SYSTEM
 }
 
-# Struttura per i dialoghi
-class DialogueEntry:
+var current_state: DialogueState = DialogueState.IDLE
+var dialogue_queue: Array[DialogueData] = []
+var current_dialogue: DialogueData
+var is_ready: bool = false
+
+# Classe per gestire i dati del dialogo
+class DialogueData:
 	var text: String
-	var speaker: Speaker
-	var delay_before: float = 0.0  # Pausa prima di mostrare questo dialogo
-	var auto_advance: bool = false  # Avanza automaticamente dopo un tempo
-	var auto_advance_time: float = 2.0
+	var speaker: SpeakerType
+	var delay_before: float
+	var auto_advance: bool
+	var auto_advance_time: float
 	
-	func _init(p_text: String, p_speaker: Speaker = Speaker.NARRATOR, p_delay: float = 0.0, p_auto: bool = false, p_auto_time: float = 2.0):
+	func _init(p_text: String, p_speaker: SpeakerType = SpeakerType.NARRATOR, 
+			   p_delay: float = 0.0, p_auto: bool = false, p_auto_time: float = 2.5):
 		text = p_text
 		speaker = p_speaker
 		delay_before = p_delay
 		auto_advance = p_auto
 		auto_advance_time = p_auto_time
 
-var current_state = State.READY
-var dialogue_queue: Array[DialogueEntry] = []
-var current_dialogue: DialogueEntry
-var delay_timer: Timer
-var auto_advance_timer: Timer
-
-# Segnali per eventi di dialogo
+# Segnali
 signal dialogue_started
 signal dialogue_finished
-signal dialogue_line_finished
+signal dialogue_line_completed
+signal textbox_hidden
+signal textbox_shown
 
 func _ready():
 	add_to_group("textbox")
-	print("starting state: READY")
+	_setup_initial_state()
+	_create_custom_timers()
+	_connect_signals()
 	
-	# ✅ PRIMA controlla che il timer esista
-	if timer:
-		timer.connect("timeout", Callable(self, "_on_Timer_timeout"))
-	
-	# Setup dei timer DOPO che tutti i nodi sono pronti
-	_setup_custom_timers()
-	
-	# Nascondi la textbox all'inizio
-	hide_textbox()
-	
-	# ESEMPI DI DIALOGHI (chiamali dopo che tutto è inizializzato)
-	call_deferred("_setup_example_dialogues")
+	# Attendi un frame per essere sicuri che tutto sia inizializzato
+	await get_tree().process_frame
+	is_ready = true
+	_debug_print("Textbox system ready")
 
-func _setup_custom_timers():
-	"""Setup sicuro dei timer personalizzati"""
-	# Setup delay timer
+func _setup_initial_state():
+	"""Configura lo stato iniziale"""
+	current_state = DialogueState.IDLE
+	hide_textbox()
+	_debug_print("Initial state setup complete")
+
+func _create_custom_timers():
+	"""Crea i timer personalizzati in modo sicuro"""
+	# Timer per i delay
 	delay_timer = Timer.new()
+	delay_timer.name = "DelayTimer"
 	delay_timer.one_shot = true
-	delay_timer.timeout.connect(_start_current_dialogue)
+	delay_timer.timeout.connect(_on_delay_timer_timeout)
 	add_child(delay_timer)
 	
-	# Setup auto advance timer
+	# Timer per l'auto-advance
 	auto_advance_timer = Timer.new()
+	auto_advance_timer.name = "AutoAdvanceTimer"
 	auto_advance_timer.one_shot = true
-	auto_advance_timer.timeout.connect(_auto_advance_dialogue)
+	auto_advance_timer.timeout.connect(_on_auto_advance_timer_timeout)
 	add_child(auto_advance_timer)
+	
+	_debug_print("Custom timers created")
 
-func _setup_example_dialogues():
-	"""Esempi di come usare il sistema di dialoghi"""
-	
-	# Esempio 1: Dialogo semplice
-	add_dialogue("Benvenuto nel gioco!", Speaker.NARRATOR)
-	add_dialogue("Ciao! Sono il capitano della nave.", Speaker.CAPTAIN)
-	add_dialogue("Salve capitano, sono pronto per l'avventura!", Speaker.PLAYER)
-	
-	# Esempio 2: Dialogo con pause e auto-avanzamento
-	add_dialogue_advanced("Il sistema è in avvio...", Speaker.SYSTEM, 1.0, true, 3.0)
-	add_dialogue_advanced("Caricamento completato.", Speaker.SYSTEM, 0.5, true, 2.0)
-	
-	# Esempio 3: Conversazione complessa
-	start_dialogue_sequence([
-		DialogueEntry.new("Abbiamo un problema!", Speaker.CAPTAIN, 0.0),
-		DialogueEntry.new("Che tipo di problema?", Speaker.PLAYER, 0.5),
-		DialogueEntry.new("I sensori rilevano una anomalia.", Speaker.CAPTAIN, 0.0),
-		DialogueEntry.new("Dobbiamo investigare.", Speaker.PLAYER, 1.0)
-	])
+func _connect_signals():
+	"""Connette i segnali in modo sicuro"""
+	if typing_timer:
+		if not typing_timer.timeout.is_connected(_on_typing_timer_timeout):
+			typing_timer.timeout.connect(_on_typing_timer_timeout)
+		typing_timer.wait_time = typing_speed
 
-func _process(delta):
+func _process(_delta):
+	if not is_ready:
+		return
+		
+	_handle_input()
+	_process_dialogue_queue()
+
+func _handle_input():
+	"""Gestisce l'input del giocatore"""
+	if not Input.is_action_just_pressed("proceed"):
+		return
+		
 	match current_state:
-		State.READY:
-			if !dialogue_queue.is_empty():
-				_process_next_dialogue()
-		State.READING:
-			if Input.is_action_just_pressed("proceed"):
-				if timer:  # ✅ Controlla che il timer esista
-					timer.stop()
-				label.text = full_text
-				end.text = "v"
-				change_state(State.FINISHED)
-		State.FINISHED:
-			if Input.is_action_just_pressed("proceed") or (current_dialogue and current_dialogue.auto_advance):
-				if current_dialogue and current_dialogue.auto_advance and auto_advance_timer:
-					auto_advance_timer.stop()
-				_advance_dialogue()
+		DialogueState.TYPING:
+			_skip_typing()
+		DialogueState.WAITING_FOR_INPUT:
+			_advance_to_next_dialogue()
 
-# FUNZIONI PUBBLICHE PER AGGIUNGERE DIALOGHI
+func _process_dialogue_queue():
+	"""Processa la coda dei dialoghi"""
+	if current_state == DialogueState.IDLE and not dialogue_queue.is_empty():
+		current_state = DialogueState.PROCESSING_QUEUE
+		_start_next_dialogue()
 
-func add_dialogue(text: String, speaker: Speaker = Speaker.NARRATOR):
-	"""Aggiunge un dialogo semplice alla coda"""
-	dialogue_queue.push_back(DialogueEntry.new(text, speaker))
+# =============================================================================
+# FUNZIONI PUBBLICHE - API per aggiungere dialoghi
+# =============================================================================
 
-func add_dialogue_advanced(text: String, speaker: Speaker, delay: float = 0.0, auto_advance: bool = false, auto_time: float = 2.0):
+func add_dialogue(text: String, speaker: SpeakerType = SpeakerType.NARRATOR):
+	"""Aggiunge un dialogo semplice"""
+	if text.is_empty():
+		_debug_print("Warning: Empty dialogue text")
+		return
+		
+	dialogue_queue.push_back(DialogueData.new(text, speaker))
+	_debug_print("Added dialogue: " + text.substr(0, 30) + "...")
+
+func add_system_message(text: String, auto_close: bool = true):
+	"""Aggiunge un messaggio di sistema"""
+	add_dialogue_advanced(text, SpeakerType.SYSTEM, 0.0, auto_close, 3.0)
+
+func add_dialogue_advanced(text: String, speaker: SpeakerType, delay: float = 0.0, 
+						  auto_advance: bool = false, auto_time: float = 2.5):
 	"""Aggiunge un dialogo con opzioni avanzate"""
-	dialogue_queue.push_back(DialogueEntry.new(text, speaker, delay, auto_advance, auto_time))
+	if text.is_empty():
+		_debug_print("Warning: Empty dialogue text")
+		return
+		
+	dialogue_queue.push_back(DialogueData.new(text, speaker, delay, auto_advance, auto_time))
 
-func start_dialogue_sequence(dialogues: Array[DialogueEntry]):
-	"""Aggiunge una sequenza di dialoghi alla coda"""
-	for dialogue in dialogues:
-		dialogue_queue.push_back(dialogue)
+func add_conversation(player_text: String, npc_text: String, speaker: SpeakerType = SpeakerType.CAPTAIN):
+	"""Aggiunge una conversazione rapida"""
+	add_dialogue(player_text, SpeakerType.PLAYER)
+	add_dialogue_advanced(npc_text, speaker, 0.5)
 
-func add_system_message(text: String, auto_advance: bool = true):
-	"""Aggiunge un messaggio di sistema che si chiude automaticamente"""
-	add_dialogue_advanced(text, Speaker.SYSTEM, 0.0, auto_advance, 3.0)
+func clear_dialogue_queue():
+	"""Svuota la coda dei dialoghi"""
+	var count = dialogue_queue.size()
+	dialogue_queue.clear()
+	_debug_print("Cleared " + str(count) + " dialogues from queue")
 
-func add_narrator_text(text: String):
-	"""Aggiunge testo del narratore"""
-	add_dialogue(text, Speaker.NARRATOR)
+func is_dialogue_active() -> bool:
+	"""Controlla se il sistema di dialoghi è attivo"""
+	return current_state != DialogueState.IDLE or not dialogue_queue.is_empty()
 
-func add_conversation(player_text: String, captain_text: String, delay_between: float = 0.5):
-	"""Aggiunge una conversazione tra player e capitano"""
-	add_dialogue(player_text, Speaker.PLAYER)
-	add_dialogue_advanced(captain_text, Speaker.CAPTAIN, delay_between)
+func force_close():
+	"""Forza la chiusura del sistema di dialoghi"""
+	_stop_all_timers()
+	dialogue_queue.clear()
+	hide_textbox()
+	current_state = DialogueState.IDLE
+	_debug_print("Dialogue system force closed")
 
-# FUNZIONI INTERNE
+# =============================================================================
+# FUNZIONI INTERNE - Gestione dei dialoghi
+# =============================================================================
 
-func _process_next_dialogue():
-	"""Processa il prossimo dialogo nella coda"""
+func _start_next_dialogue():
+	"""Inizia il prossimo dialogo nella coda"""
 	if dialogue_queue.is_empty():
+		_finish_all_dialogues()
 		return
 	
 	current_dialogue = dialogue_queue.pop_front()
 	
-	if current_dialogue.delay_before > 0 and delay_timer:
+	if current_dialogue.delay_before > 0.0:
 		delay_timer.wait_time = current_dialogue.delay_before
 		delay_timer.start()
 	else:
-		_start_current_dialogue()
+		_display_current_dialogue()
 
-func _start_current_dialogue():
-	"""Inizia a mostrare il dialogo corrente"""
-	full_text = current_dialogue.text
-	current_index = 0
-	label.text = ""
+func _display_current_dialogue():
+	"""Mostra il dialogo corrente"""
+	if not current_dialogue:
+		_debug_print("Error: No current dialogue to display")
+		return
 	
-	_setup_speaker_visuals(current_dialogue.speaker)
-	change_state(State.READING)
+	full_text = current_dialogue.text
+	current_char_index = 0
+	
+	_setup_speaker_display(current_dialogue.speaker)
+	_clear_text_display()
 	show_textbox()
 	
-	# ✅ Controlla che il timer esista prima di avviarlo
-	if timer:
-		timer.start()
+	current_state = DialogueState.TYPING
+	_start_typing()
 	
 	dialogue_started.emit()
 
-func _setup_speaker_visuals(speaker: Speaker):
-	"""Configura le texture in base al parlante"""
-	# ✅ Controlla che le texture esistano prima di nasconderle
-	if player_texture:
-		player_texture.hide()
-	if captain_texture:
-		captain_texture.hide()
+func _start_typing():
+	"""Inizia l'animazione di scrittura"""
+	if text_label:
+		text_label.text = ""
+	if end_label:
+		end_label.text = ""
 	
-	match speaker:
-		Speaker.PLAYER:
-			if player_texture:
-				player_texture.show()
-			if start:
-				start.text = "PLAYER:"
-		Speaker.CAPTAIN:
-			if captain_texture:
-				captain_texture.show()
-			if start:
-				start.text = "CAPTAIN:"
-		Speaker.NARRATOR:
-			if start:
-				start.text = "NARRATOR:"
-		Speaker.SYSTEM:
-			if start:
-				start.text = "SYSTEM:"
+	if typing_timer:
+		typing_timer.start()
 
-func _advance_dialogue():
-	"""Avanza al prossimo dialogo o chiude la textbox"""
-	dialogue_line_finished.emit()
+func _skip_typing():
+	"""Salta l'animazione di scrittura"""
+	if typing_timer:
+		typing_timer.stop()
 	
-	if !dialogue_queue.is_empty():
-		_process_next_dialogue()
-	else:
-		hide_textbox()
-		change_state(State.READY)
-		dialogue_finished.emit()
-
-func _auto_advance_dialogue():
-	"""Avanza automaticamente il dialogo"""
-	_advance_dialogue()
-
-func hide_textbox():
-	# ✅ Controlla che tutti i nodi esistano prima di usarli
-	if start:
-		start.text = ""
-	if end:
-		end.text = ""
-	if label:
-		label.text = ""
-	if textbox_container:
-		textbox_container.hide()
+	if text_label and not full_text.is_empty():
+		text_label.text = full_text
 	
-	# ✅ Controlla che i timer esistano prima di fermarli
-	if timer:
-		timer.stop()
+	_finish_typing()
+
+func _finish_typing():
+	"""Completa l'animazione di scrittura"""
+	current_state = DialogueState.WAITING_FOR_INPUT
+	
+	if end_label:
+		end_label.text = "v"
+	
+	# Setup auto-advance se necessario
+	if current_dialogue and current_dialogue.auto_advance:
+		auto_advance_timer.wait_time = current_dialogue.auto_advance_time
+		auto_advance_timer.start()
+	
+	dialogue_line_completed.emit()
+
+func _advance_to_next_dialogue():
+	"""Avanza al prossimo dialogo"""
 	if auto_advance_timer:
 		auto_advance_timer.stop()
 	
+	current_state = DialogueState.PROCESSING_QUEUE
+	_start_next_dialogue()
+
+func _finish_all_dialogues():
+	"""Termina tutti i dialoghi e chiude la textbox"""
+	hide_textbox()
+	current_state = DialogueState.IDLE
+	current_dialogue = null
+	dialogue_finished.emit()
+	_debug_print("All dialogues finished")
+
+# =============================================================================
+# FUNZIONI UI - Gestione dell'interfaccia
+# =============================================================================
+
+func show_textbox():
+	"""Mostra la textbox"""
+	if textbox_container:
+		textbox_container.show()
+		textbox_shown.emit()
+
+func hide_textbox():
+	"""Nasconde la textbox"""
+	_stop_all_timers()
+	_clear_all_display()
+	
+	if textbox_container:
+		textbox_container.hide()
+	
+	_hide_speaker_textures()
+	textbox_hidden.emit()
+
+func _clear_all_display():
+	"""Pulisce tutti gli elementi di testo"""
+	if start_label:
+		start_label.text = ""
+	if text_label:
+		text_label.text = ""
+	if end_label:
+		end_label.text = ""
+
+func _clear_text_display():
+	"""Pulisce solo il testo principale"""
+	if text_label:
+		text_label.text = ""
+	if end_label:
+		end_label.text = ""
+
+func _setup_speaker_display(speaker: SpeakerType):
+	"""Configura la visualizzazione in base al parlante"""
+	_hide_speaker_textures()
+	
+	if not start_label:
+		return
+	
+	match speaker:
+		SpeakerType.PLAYER:
+			start_label.text = "PLAYER:"
+			if player_texture:
+				player_texture.show()
+		SpeakerType.CAPTAIN:
+			start_label.text = "CAPTAIN:"
+			if captain_texture:
+				captain_texture.show()
+		SpeakerType.NARRATOR:
+			start_label.text = "NARRATOR:"
+		SpeakerType.SYSTEM:
+			start_label.text = "SYSTEM:"
+
+func _hide_speaker_textures():
+	"""Nasconde tutte le texture dei personaggi"""
 	if player_texture:
 		player_texture.hide()
 	if captain_texture:
 		captain_texture.hide()
 
-func show_textbox():
-	if end:
-		end.text = ""
-	if textbox_container:
-		textbox_container.show()
+# =============================================================================
+# CALLBACK DEI TIMER
+# =============================================================================
 
-func _on_Timer_timeout():
-	if current_index < full_text.length():
-		if label:
-			label.text += full_text[current_index]
-		current_index += 1
+func _on_typing_timer_timeout():
+	"""Callback del timer di scrittura"""
+	if current_char_index < full_text.length():
+		if text_label:
+			text_label.text += full_text[current_char_index]
+		current_char_index += 1
 	else:
-		# Testo completato
-		if end:
-			end.text = "v"
-		if timer:
-			timer.stop()
-		change_state(State.FINISHED)
-		
-		# Se è auto-advance, avvia il timer
-		if current_dialogue and current_dialogue.auto_advance and auto_advance_timer:
-			auto_advance_timer.wait_time = current_dialogue.auto_advance_time
-			auto_advance_timer.start()
+		_finish_typing()
 
-func change_state(next_state):
-	current_state = next_state
-	match current_state:
-		State.READY:
-			print("changing state: READY")
-		State.READING:
-			print("changing state: READING")
-		State.FINISHED:
-			print("changing state: FINISHED")
+func _on_delay_timer_timeout():
+	"""Callback del timer di delay"""
+	_display_current_dialogue()
 
-# FUNZIONI UTILITY
+func _on_auto_advance_timer_timeout():
+	"""Callback del timer di auto-advance"""
+	_advance_to_next_dialogue()
 
-func clear_dialogue_queue():
-	"""Svuota la coda dei dialoghi"""
-	dialogue_queue.clear()
+# =============================================================================
+# UTILITY E DEBUG
+# =============================================================================
 
-func is_dialogue_active() -> bool:
-	"""Ritorna true se c'è un dialogo attivo"""
-	return current_state != State.READY or !dialogue_queue.is_empty()
+func _stop_all_timers():
+	"""Ferma tutti i timer"""
+	if typing_timer:
+		typing_timer.stop()
+	if delay_timer:
+		delay_timer.stop()
+	if auto_advance_timer:
+		auto_advance_timer.stop()
 
-func skip_current_dialogue():
-	"""Salta il dialogo corrente (utile per debug)"""
-	if current_state == State.READING:
-		if timer:
-			timer.stop()
-		if label:
-			label.text = full_text
-		if end:
-			end.text = "v"
-		change_state(State.FINISHED)
+func _debug_print(message: String):
+	"""Stampa messaggi di debug"""
+	print("[Textbox] ", message)
+
+func get_dialogue_queue_size() -> int:
+	"""Ritorna il numero di dialoghi in coda"""
+	return dialogue_queue.size()
+
+func set_typing_speed(new_speed: float):
+	"""Cambia la velocità di scrittura"""
+	typing_speed = clamp(new_speed, 0.01, 1.0)
+	if typing_timer:
+		typing_timer.wait_time = typing_speed
+
+# =============================================================================
+# ESEMPI E TEST (rimuovi in produzione)
+# =============================================================================
+
+func _test_dialogues():
+	"""Funzione di test - rimuovi in produzione"""
+	add_dialogue("Benvenuto nel gioco!", SpeakerType.SYSTEM)
+	add_dialogue("Ciao pilota! Sono il capitano.", SpeakerType.CAPTAIN)
+	add_dialogue("Salve capitano, pronto per la missione!", SpeakerType.PLAYER)
+	add_system_message("Sistema di dialoghi attivo", true)

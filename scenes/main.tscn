@@ -73,3 +73,4 @@ position = Vector2(493, 108)
 
 [node name="FileText" parent="." instance=ExtResource("13_na2nm")]
 position = Vector2(-963, -422)
+collected = false

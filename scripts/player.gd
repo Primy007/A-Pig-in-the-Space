@@ -3,9 +3,7 @@ extends CharacterBody2D
 # --- CONSTANTS ---
 const FIRE_RATE: float = 0.2
 const SHOOT_EFFECT_DURATION: float = 0.16
-const BASE_SHAKE_STRENGTH: float = 5.0  # Ridotto da 14.0
-const SHAKE_DURATION: float = 0.15
-const HIT_SHAKE_STRENGTH: float = 18.0  # Nuovo valore per quando il player viene colpito
+const HIT_SHAKE_STRENGTH: float = 18.0  # Valore per quando il player viene colpito
 const HIT_SHAKE_DURATION: float = 0.2   # Durata più lunga per l'impatto
 
 # --- MOVEMENT SETTINGS ---
@@ -173,7 +171,7 @@ func shoot():
 			_fire_single_bullet()
 			
 		_show_shoot_effect()
-		apply_screen_shake(BASE_SHAKE_STRENGTH, SHAKE_DURATION)
+		# Rimossa la chiamata a apply_screen_shake per il tiro
 
 func _fire_single_bullet():
 	var bullet = bullet_scene.instantiate()
