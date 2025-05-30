@@ -82,13 +82,8 @@ func _ready():
 	# Inizializza il gruppo del player
 	add_to_group("player")
 	
-	# Trova il GameManager
-	game_manager = get_node("/root/GameManager") if has_node("/root/GameManager") else null
+	print("Player aggiunto al gruppo 'player'")
 	
-	# Avvia il gioco se il GameManager esiste
-	if game_manager:
-		game_manager.start_game()
-
 func _physics_process(delta):
 	if is_dying:
 		return
@@ -331,9 +326,8 @@ func _handle_dead():
 	powerup_timers.clear()
 	active_powerups.clear()
 	
-	# Notifica il GameManager della morte del player
-	if game_manager:
-		game_manager.on_player_died()
+	# Notifica il GameManager della morte del player (usando l'autoload)
+	GameManager.on_player_died()
 	
 	# Animazione di morte
 	_play_death_animation()

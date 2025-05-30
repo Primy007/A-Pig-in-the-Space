@@ -2,7 +2,7 @@ extends Area2D
 
 var speed = 1200  # Velocità del proiettile
 var direction = Vector2.ZERO  # Direzione predefinita (verrà sovrascritta)
-var damage = 30  # Valore base del danno inflitto
+var damage = 20  # Valore base del danno inflitto
 
 # Variabili per i power-up
 var penetration_count = 0  # Numero di nemici attraversati

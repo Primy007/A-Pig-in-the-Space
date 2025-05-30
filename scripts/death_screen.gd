@@ -1,12 +1,12 @@
 # death_screen.gd - VERSIONE CORRETTA
-extends CanvasLayer  # CAMBIATO: Usa CanvasLayer invece di Control per seguire la camera
+extends CanvasLayer
 
 # --- REFERENCES ---
 @onready var score_label = $Control/VBoxContainer/ScoreLabel
 @onready var restart_button = $Control/VBoxContainer/ButtonContainer/RestartButton
 @onready var quit_button = $Control/VBoxContainer/ButtonContainer/QuitButton
 @onready var background = $Control/Background
-@onready var control_container = $Control  # Riferimento al nodo Control principale
+@onready var control_container = $Control
 
 var game_manager: Node
 
@@ -20,30 +20,37 @@ func _ready():
 	# IMPORTANTE: Imposta il process mode per funzionare anche in pausa
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
+	# Imposta anche tutti i nodi figli per funzionare in pausa
+	_set_children_process_mode_always(self)
+	
 	# Connetti i bottoni
 	if restart_button:
 		restart_button.pressed.connect(_on_restart_pressed)
-		# Assicurati che anche il bottone funzioni in pausa
-		restart_button.process_mode = Node.PROCESS_MODE_ALWAYS
 	if quit_button:
 		quit_button.pressed.connect(_on_quit_pressed)
-		# Assicurati che anche il bottone funzioni in pausa
-		quit_button.process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Imposta anche il control container per funzionare in pausa
-	if control_container:
-		control_container.process_mode = Node.PROCESS_MODE_ALWAYS
-		control_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	
-	# Trova il GameManager
+	# Trova il GameManager (dovrebbe essere un autoload)
+	call_deferred("_setup_game_manager")
+
+func _set_children_process_mode_always(node: Node):
+	"""Imposta ricorsivamente il process mode di tutti i figli"""
+	node.process_mode = Node.PROCESS_MODE_ALWAYS
+	for child in node.get_children():
+		_set_children_process_mode_always(child)
+
+func _setup_game_manager():
 	game_manager = get_node("/root/GameManager") if has_node("/root/GameManager") else null
 	
-	# Connetti al segnale di morte del player se il GameManager esiste
 	if game_manager:
-		game_manager.player_died.connect(show_death_screen)
+		# Connetti al segnale di morte del player
+		if not game_manager.player_died.is_connected(show_death_screen):
+			game_manager.player_died.connect(show_death_screen)
+		print("Death screen connesso al GameManager")
+	else:
+		print("ERRORE: GameManager non trovato come autoload!")
 
 func show_death_screen():
-	print("Mostrando schermata di morte")  # Debug
+	print("Mostrando schermata di morte")
 	
 	# Mostra il punteggio finale
 	var final_score = game_manager.get_current_score() if game_manager else 0
@@ -59,14 +66,16 @@ func show_death_screen():
 	# Assicurati che i bottoni siano focusabili
 	if restart_button:
 		restart_button.grab_focus()
+	
+	print("Schermata di morte mostrata, gioco in pausa")
 
 func hide_death_screen():
-	print("Nascondendo schermata di morte")  # Debug
+	print("Nascondendo schermata di morte")
 	visible = false
 	get_tree().paused = false
 
 func _on_restart_pressed():
-	print("Restart premuto")  # Debug
+	print("Restart premuto")
 	
 	# Prima togli la pausa
 	get_tree().paused = false
@@ -82,7 +91,7 @@ func _on_restart_pressed():
 	get_tree().reload_current_scene()
 
 func _on_quit_pressed():
-	print("Quit premuto")  # Debug
+	print("Quit premuto")
 	
 	# Prima togli la pausa
 	get_tree().paused = false
@@ -93,13 +102,15 @@ func _on_quit_pressed():
 # Gestisce l'input per evitare che i controlli del gioco funzionino quando la schermata è attiva
 func _input(event):
 	if visible and event is InputEvent:
-		# Accetta solo input dei bottoni quando la schermata è visibile
-		if event is InputEventKey or event is InputEventMouseButton:
-			get_viewport().set_input_as_handled()
+		# Blocca gli input quando la schermata è visibile
+		get_viewport().set_input_as_handled()
 
-# Funzione per test (puoi rimuoverla in produzione)
+# Input per test
 func _unhandled_input(event):
-	if event.is_action_pressed("ui_accept") and visible:
+	if not visible:
+		return
+		
+	if event.is_action_pressed("ui_accept"):
 		_on_restart_pressed()
-	elif event.is_action_pressed("ui_cancel") and visible:
+	elif event.is_action_pressed("ui_cancel"):
 		_on_quit_pressed()

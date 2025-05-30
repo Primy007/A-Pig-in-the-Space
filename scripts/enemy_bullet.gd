@@ -2,7 +2,7 @@ extends Area2D
 
 var speed = 600  # Velocità del proiettile
 var direction = Vector2.ZERO  # Direzione predefinita (verrà sovrascritta)
-var damage = 1  # Quantità di danno che il proiettile infligge
+var damage = 3  # Quantità di danno che il proiettile infligge
 
 @onready var anim_explosion = $Bullet_animation
 

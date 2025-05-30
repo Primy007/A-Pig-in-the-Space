@@ -148,7 +148,7 @@ position = Vector2(179, 232)
 script = ExtResource("1_fpblk")
 bullet_scene = ExtResource("2_q1mlb")
 muzzle_markers = [NodePath("Marker"), NodePath("Marker2")]
-powerup_drop_chance = 1.0
+powerup_drop_chance = 0.4
 powerup_scenes = Array[PackedScene]([ExtResource("3_3yghl"), ExtResource("4_a2ajj"), ExtResource("5_a7piq"), ExtResource("6_2nmg0"), ExtResource("7_rpwo1"), ExtResource("8_a7q3c")])
 
 [node name="Enemy_flying" type="AnimatedSprite2D" parent="."]

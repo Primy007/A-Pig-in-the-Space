@@ -1,15 +1,12 @@
 # game_manager.gd - VERSIONE CORRETTA
 extends Node
 
-# --- SINGLETON PATTERN ---
-# Questo script dovrebbe essere un autoload (Singleton)
-
 # --- SPAWN SETTINGS ---
 @export var enemy_scene: PackedScene
-@export var spawn_interval: float = 3.0
-@export var min_spawn_distance: float = 1200.0
-@export var max_spawn_distance: float = 1800.0
-@export var spawn_margin: float = 200.0
+@export var spawn_interval: float = 1.5  # Ridotto da 3.0 a 1.5 secondi (spawn più frequente)
+@export var min_spawn_distance: float = 800.0  # Ridotto da 1200.0 (più vicino al player)
+@export var max_spawn_distance: float = 1400.0  # Ridotto da 1800.0 (range più stretto)
+@export var spawn_margin: float = 150.0  # Ridotto da 200.0
 
 # --- SCORE SYSTEM ---
 var current_score: int = 0
@@ -28,57 +25,84 @@ signal score_changed(new_score: int)
 signal player_died
 
 func _ready():
-	print("GameManager ready")  # Debug
+	print("GameManager ready (Autoload)")
+	
+	# Carica la scena del nemico se non è assegnata
+	if not enemy_scene:
+		enemy_scene = preload("res://scenes/enemy_fly.tscn")
+	
 	_setup_spawn_timer()
 	_connect_signals()
+	
+	# Aspetta un frame per permettere alla scena di caricarsi completamente
+	call_deferred("_delayed_start")
+
+func _delayed_start():
+	# Non iniziare automaticamente - aspetta che il player sia pronto
+	pass
 
 func _setup_spawn_timer():
 	spawn_timer = Timer.new()
 	spawn_timer.wait_time = spawn_interval
 	spawn_timer.timeout.connect(_spawn_enemy)
-	spawn_timer.autostart = false  # Non iniziare automaticamente
+	spawn_timer.autostart = false
 	add_child(spawn_timer)
 
 func _connect_signals():
 	score_changed.connect(_on_score_changed)
 
 func start_game():
-	print("Avviando il gioco")  # Debug
+	print("Avviando il gioco")
 	game_active = true
 	current_score = 0
 	score_changed.emit(current_score)
 	
+	# Aspetta un momento prima di cercare il player
+	await get_tree().process_frame
+	
 	# Trova il player
 	player = get_tree().get_first_node_in_group("player")
-	if !player:
-		print("ERRORE: Player non trovato!")
+	if not player:
+		print("ERRORE: Player non trovato nel gruppo 'player'!")
 		return
+	
+	print("Player trovato: ", player.name)
 	
 	if spawn_timer:
 		spawn_timer.start()
+		print("Timer di spawn avviato")
 	
 	print("Gioco avviato con successo")
 
 func stop_game():
-	print("Fermando il gioco")  # Debug
+	print("Fermando il gioco")
 	game_active = false
 	if spawn_timer:
 		spawn_timer.stop()
 
 func _spawn_enemy():
-	if !game_active or !is_instance_valid(player) or !enemy_scene:
+	if not game_active or not is_instance_valid(player) or not enemy_scene:
+		print("Impossibile spawnare nemico: game_active=", game_active, ", player_valid=", is_instance_valid(player), ", enemy_scene=", enemy_scene != null)
 		return
 	
 	var spawn_position = _get_random_spawn_position()
 	if spawn_position == Vector2.ZERO:
+		print("Posizione di spawn non valida")
 		return
 	
 	var enemy = enemy_scene.instantiate()
 	enemy.global_position = spawn_position
-	get_tree().current_scene.add_child(enemy)
+	
+	# Aggiungi alla scena corrente
+	var scene_root = get_tree().current_scene
+	if scene_root:
+		scene_root.add_child(enemy)
+		print("Nemico spawnato in posizione: ", spawn_position)
+	else:
+		print("ERRORE: Scena corrente non trovata")
 
 func _get_random_spawn_position() -> Vector2:
-	if !player:
+	if not player:
 		return Vector2.ZERO
 	
 	var player_pos = player.global_position
@@ -92,17 +116,21 @@ func _get_random_spawn_position() -> Vector2:
 		if _is_valid_spawn_position(spawn_pos):
 			return spawn_pos
 	
+	# Fallback: spawn in una posizione minima
 	return player_pos + Vector2(min_spawn_distance, 0).rotated(randf() * 2 * PI)
 
 func _is_valid_spawn_position(pos: Vector2) -> bool:
-	var viewport = get_viewport().get_visible_rect()
-	var camera = get_viewport().get_camera_2d()
-	
-	if !camera:
+	var viewport = get_viewport()
+	if not viewport:
+		return true
+		
+	var camera = viewport.get_camera_2d()
+	if not camera:
 		return true
 	
+	var viewport_rect = viewport.get_visible_rect()
 	var camera_pos = camera.global_position
-	var screen_size = viewport.size / camera.zoom
+	var screen_size = viewport_rect.size / camera.zoom
 	
 	var left_bound = camera_pos.x - screen_size.x / 2 - spawn_margin
 	var right_bound = camera_pos.x + screen_size.x / 2 + spawn_margin
@@ -112,7 +140,7 @@ func _is_valid_spawn_position(pos: Vector2) -> bool:
 	return pos.x < left_bound or pos.x > right_bound or pos.y < top_bound or pos.y > bottom_bound
 
 func add_score(points: int):
-	if !game_active:
+	if not game_active:
 		return
 	current_score += points
 	score_changed.emit(current_score)
@@ -125,18 +153,15 @@ func _on_score_changed(new_score: int):
 		score_label.text = "Score: " + str(new_score)
 
 func on_player_died():
-	print("Player morto - fermando il gioco")  # Debug
+	print("Player morto - fermando il gioco")
 	stop_game()
 	
-	# Usa call_deferred per evitare problemi di timing
-	call_deferred("_emit_player_died_signal")
-
-func _emit_player_died_signal():
-	print("Emettendo segnale player_died")  # Debug
+	# Emetti il segnale immediatamente
 	player_died.emit()
+	print("Segnale player_died emesso")
 
 func reset_game():
-	print("Resettando il gioco")  # Debug
+	print("Resettando il gioco")
 	stop_game()
 	
 	current_score = 0
