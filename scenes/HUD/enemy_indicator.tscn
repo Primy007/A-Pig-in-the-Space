@@ -8,13 +8,11 @@
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1")
-icon_distance_behind_arrow = 80.0
 
 [node name="ArrowSprite" type="Sprite2D" parent="."]
 texture = ExtResource("2")
 
 [node name="AlertIcon" type="Sprite2D" parent="."]
-position = Vector2(0, -30)
 texture = ExtResource("3")
 
 [node name="DistanceLabel" type="Label" parent="."]

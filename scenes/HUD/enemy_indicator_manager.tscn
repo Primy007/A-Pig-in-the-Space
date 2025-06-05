@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ch5uvbw3b4b8q"]
+
+[ext_resource type="Script" path="res://scripts/hud/enemy_indicator_manager.gd" id="1_bqn3s"]
+
+[node name="EnemyIndicatorManager" type="CanvasLayer"]
+script = ExtResource("1_bqn3s")

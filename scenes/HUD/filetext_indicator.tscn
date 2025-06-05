@@ -8,7 +8,6 @@
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1")
-icon_distance_behind_arrow = 80.0
 
 [node name="ArrowSprite" type="Sprite2D" parent="."]
 texture = ExtResource("2")

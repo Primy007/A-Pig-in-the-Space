@@ -1,4 +1,4 @@
-# main.gd - VERSIONE CORRETTA
+# main.gd - VERSIONE CORRETTA CON INDICATORI
 extends Node
 
 func _ready():
@@ -11,10 +11,23 @@ func _setup_scene():
 	call_deferred("_start_game_when_ready")
 
 func _setup_managers():
-	# RIMUOVI QUESTA RIGA - GameManager deve essere autoload
-	# var indicator_manager = preload("res://scenes/HUD/indicator_manager.tscn").instantiate()
-	# add_child(indicator_manager)
-	pass
+	# Aggiungi i manager degli indicatori
+	_setup_indicator_managers()
+
+func _setup_indicator_managers():
+	# Manager per indicatori nemici
+	var enemy_indicator_manager = preload("res://scenes/hud/enemy_indicator_manager.tscn")
+	if enemy_indicator_manager:
+		var enemy_manager_instance = enemy_indicator_manager.instantiate()
+		add_child(enemy_manager_instance)
+		print("Enemy indicator manager aggiunto")
+	
+	# Manager per indicatori file di testo
+	var filetext_indicator_manager = preload("res://scenes/hud/filetext_indicator_manager.tscn")
+	if filetext_indicator_manager:
+		var filetext_manager_instance = filetext_indicator_manager.instantiate()
+		add_child(filetext_manager_instance)
+		print("Filetext indicator manager aggiunto")
 
 func _setup_ui():
 	var score_hud = preload("res://scenes/ui/score_hud.tscn").instantiate()

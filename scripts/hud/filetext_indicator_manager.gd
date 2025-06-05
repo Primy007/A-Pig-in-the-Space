@@ -6,18 +6,27 @@ class_name FiletextIndicatorManager
 
 # Tracciamento degli indicatori attivi
 var active_indicators: Dictionary = {}
+var player: Node2D
 
 # Configurazione
-@export var check_frequency: float = 0.5  # Controlla nuovi file di testo ogni 0.5 secondi
+@export var check_frequency: float = 0.5
 
 # Timer per controlli periodici
 var check_timer: float = 0.0
 
 func _ready():
-	# Metti questo layer dietro gli altri elementi dell'HUD
 	layer = 1
+	# Carica la scena dell'indicatore se non assegnata
+	if not indicator_scene:
+		var indicator_path = "res://scenes/hud/filetext_indicator.tscn"
+		if ResourceLoader.exists(indicator_path):
+			indicator_scene = load(indicator_path)
 
 func _process(delta):
+	if not player:
+		player = get_tree().get_first_node_in_group("player")
+		return
+	
 	check_timer += delta
 	
 	if check_timer >= check_frequency:
@@ -30,13 +39,12 @@ func _check_for_filetexts():
 	var filetexts = get_tree().get_nodes_in_group("filetext")
 	
 	for filetext in filetexts:
-		if !active_indicators.has(filetext):
+		if not active_indicators.has(filetext):
 			_create_indicator_for_filetext(filetext)
 
 func _create_indicator_for_filetext(filetext: Node2D):
 	"""Crea un nuovo indicatore per un file di testo"""
-	if !indicator_scene:
-		printerr("FiletextIndicatorManager: Nessuna scena indicatore assegnata!")
+	if not indicator_scene:
 		return
 	
 	var indicator = indicator_scene.instantiate()
@@ -45,9 +53,11 @@ func _create_indicator_for_filetext(filetext: Node2D):
 	
 	active_indicators[filetext] = indicator
 	
-	# SOLUZIONE: Usa un callable lambda che ignora gli argomenti del segnale
+	# Connetti il segnale di raccolta in modo sicuro
 	if filetext.has_signal("file_collected"):
-		filetext.file_collected.connect(func(_arg1 = null, _arg2 = null): _remove_indicator_for_filetext(filetext))
+		# Usa una connessione che ignora gli argomenti extra
+		var callable = func(_content = null): _remove_indicator_for_filetext(filetext)
+		filetext.file_collected.connect(callable)
 
 func _remove_indicator_for_filetext(filetext: Node2D):
 	"""Rimuove l'indicatore per un filetext specifico"""
@@ -62,7 +72,7 @@ func _cleanup_indicators():
 	var filetexts_to_remove = []
 	
 	for filetext in active_indicators.keys():
-		if !is_instance_valid(filetext):
+		if not is_instance_valid(filetext):
 			filetexts_to_remove.append(filetext)
 	
 	for filetext in filetexts_to_remove:
@@ -72,7 +82,7 @@ func _cleanup_indicators():
 		active_indicators.erase(filetext)
 
 func clear_all_indicators():
-	"""Rimuove tutti gli indicatori (utile per cambi di livello)"""
+	"""Rimuove tutti gli indicatori"""
 	for indicator in active_indicators.values():
 		if is_instance_valid(indicator):
 			indicator.queue_free()

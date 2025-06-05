@@ -1,8 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://filetextmanager123"]
+[gd_scene load_steps=2 format=3 uid="uid://cr2h1srmluq2o"]
 
 [ext_resource type="Script" path="res://scripts/hud/filetext_indicator_manager.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://filetextindicator123" path="res://scenes/HUD/filetext_indicator.tscn" id="2"]
 
 [node name="FiletextIndicatorManager" type="CanvasLayer"]
 script = ExtResource("1")
-indicator_scene = ExtResource("2")
