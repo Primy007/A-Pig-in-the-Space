@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bvuge3ghg5v4"]
+[gd_scene load_steps=8 format=3 uid="uid://bvuge3ghg5v4"]
 
 [ext_resource type="PackedScene" uid="uid://peodo11jl1nh" path="res://scenes/asteroid.tscn" id="1_15ar3"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_ftjo1"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bwgq04d5523lr" path="res://assets/images/background/EmptyStarfield.jpg" id="3_12b7q"]
 [ext_resource type="PackedScene" uid="uid://v3hdef2mwb1l" path="res://scenes/player.tscn" id="5_ul1qq"]
 [ext_resource type="PackedScene" uid="uid://decgqip5dj2nh" path="res://scenes/HUD/textbox.tscn" id="6_l54ps"]
+[ext_resource type="PackedScene" uid="uid://filetext123" path="res://scenes/filetext.tscn" id="7_8bpjg"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ftjo1")
@@ -27,3 +28,6 @@ texture = ExtResource("3_12b7q")
 position = Vector2(800, 481)
 
 [node name="Textbox" parent="." instance=ExtResource("6_l54ps")]
+
+[node name="FileText" parent="." instance=ExtResource("7_8bpjg")]
+position = Vector2(-794, -283)

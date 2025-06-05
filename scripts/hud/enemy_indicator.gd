@@ -119,7 +119,7 @@ func _rotate_arrow():
 	arrow_sprite.rotation = direction.angle() + PI/2
 	
 	# Posiziona l'icona dietro la freccia
-	alert_icon.position = -direction * 40.0
+	alert_icon.position = -direction * 70.0
 
 func _update_distance():
 	"""Aggiorna la distanza"""
