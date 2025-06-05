@@ -1,7 +1,10 @@
-# enemy_fly.gd - VERSIONE AGGIORNATA
+# enemy_fly.gd - VERSIONE CON SEGNALE DI MORTE
 extends CharacterBody2D
 
 var is_dying: bool = false
+
+# --- SEGNALI ---
+signal enemy_died
 
 # --- Configurazione esposta ---
 @export var speed: float = 200
@@ -24,9 +27,6 @@ var is_dying: bool = false
 @onready var attack_cooldown = $AttackCooldown
 @onready var player = get_tree().get_first_node_in_group("player")
 @onready var health_bar = $HealthBar
-
-# --- Game Manager Reference ---
-var game_manager: Node
 
 func _ready():
 	animation_flying.play("Normal")
@@ -112,6 +112,9 @@ func _handle_dead():
 	collision_layer = 0
 	collision_mask = 0
 	health_bar.visible = false
+	
+	# Emetti il segnale PRIMA di aggiungere il punteggio
+	enemy_died.emit()
 	
 	# Usa direttamente GameManager (autoload)
 	if GameManager:

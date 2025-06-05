@@ -33,6 +33,10 @@ func _setup_ui():
 	var score_hud = preload("res://scenes/ui/score_hud.tscn").instantiate()
 	add_child(score_hud)
 	
+	# AGGIUNGI QUESTA PARTE
+	var wave_hud = preload("res://scenes/ui/wave_hud.tscn").instantiate()
+	add_child(wave_hud)
+	
 	var death_screen = preload("res://scenes/ui/death_screen.tscn").instantiate()
 	add_child(death_screen)
 	

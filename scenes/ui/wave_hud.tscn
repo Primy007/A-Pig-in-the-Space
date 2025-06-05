@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmw8h4thoyivw"]
+
+[ext_resource type="Script" path="res://scripts/ui/wave_hud.gd" id="1_xh4xm"]
+
+[node name="WaveHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 360.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_xh4xm")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -98.0
+offset_top = -92.5
+offset_right = 98.0
+offset_bottom = 92.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="WaveLabel" type="Label" parent="VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Wave: 1"
+
+[node name="ProgressLabel" type="Label" parent="VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Enemies: 0/0"
+
+[node name="ProgressBar" type="ProgressBar" parent="VBox"]
+custom_minimum_size = Vector2(470, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+
+[node name="PreparationLabel" type="Label" parent="VBox"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_font_sizes/font_size = 24
+text = "Next wave in: 3"

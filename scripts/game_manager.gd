@@ -1,37 +1,57 @@
-# game_manager.gd - VERSIONE CORRETTA
+# game_manager.gd - VERSIONE CON SISTEMA ONDATE
 extends Node
-# Aggiungi all'inizio del file, dopo extends Node:
+
 func _init():
 	print("GameManager autoload inizializzato")
-	name = "GameManager"  # Assicura il nome corretto
+	name = "GameManager"
 
 # --- SPAWN SETTINGS ---
 @export var enemy_scene: PackedScene
-@export var spawn_interval: float = 1.5  # Ridotto da 3.0 a 1.5 secondi (spawn più frequente)
-@export var min_spawn_distance: float = 800.0  # Ridotto da 1200.0 (più vicino al player)
-@export var max_spawn_distance: float = 1400.0  # Ridotto da 1800.0 (range più stretto)
-@export var spawn_margin: float = 150.0  # Ridotto da 200.0
+@export var min_spawn_distance: float = 800.0
+@export var max_spawn_distance: float = 1400.0
+@export var spawn_margin: float = 150.0
+
+# --- WAVE SYSTEM ---
+var current_wave: int = 1
+var enemies_in_current_wave: int = 0
+var enemies_spawned_this_wave: int = 0
+var enemies_killed_this_wave: int = 0
+var wave_active: bool = false
+var wave_preparation_time: float = 3.0  # Tempo tra le ondate
+
+# Configurazione progressive delle ondate
+var base_enemies_per_wave: int = 3
+var enemies_increase_per_wave: int = 2
+var max_concurrent_enemies: int = 15  # Limite per performance
+var spawn_interval_base: float = 1.0
+var spawn_interval_reduction: float = 0.05  # Riduzione per ondata
 
 # --- SCORE SYSTEM ---
 var current_score: int = 0
 var points_per_enemy: int = 100
+var wave_completion_bonus: int = 500
 
 # --- GAME STATE ---
 var game_active: bool = false
 
 # --- REFERENCES ---
 var spawn_timer: Timer
+var wave_timer: Timer
 var player: CharacterBody2D
 var score_label: Label
+var wave_label: Label
 
 # --- SIGNALS ---
 signal score_changed(new_score: int)
 signal player_died
+signal wave_started(wave_number: int)
+signal wave_completed(wave_number: int)
+signal preparing_next_wave(time_left: float)
 
 func _ready():
 	print("GameManager ready (Autoload)")
 	
-	# Carica la scena del nemico con gestione errori
+	# Carica la scena del nemico
 	if not enemy_scene:
 		var enemy_path = "res://scenes/enemy_fly.tscn"
 		if ResourceLoader.exists(enemy_path):
@@ -40,32 +60,42 @@ func _ready():
 		else:
 			print("ERRORE: File enemy_fly.tscn non trovato in ", enemy_path)
 	
-	_setup_spawn_timer()
+	_setup_timers()
 	_connect_signals()
 	call_deferred("_delayed_start")
 
 func _delayed_start():
 	print("GameManager _delayed_start chiamato")
-	# Verifica che tutto sia pronto
 	if get_tree() and get_tree().current_scene:
 		print("Scena corrente disponibile: ", get_tree().current_scene.name)
 	else:
 		print("ERRORE: Scena corrente non disponibile")
 
-func _setup_spawn_timer():
+func _setup_timers():
+	# Timer per spawn nemici
 	spawn_timer = Timer.new()
-	spawn_timer.wait_time = spawn_interval
 	spawn_timer.timeout.connect(_spawn_enemy)
 	spawn_timer.autostart = false
 	add_child(spawn_timer)
+	
+	# Timer per preparazione ondata
+	wave_timer = Timer.new()
+	wave_timer.timeout.connect(_start_next_wave)
+	wave_timer.autostart = false
+	add_child(wave_timer)
 
 func _connect_signals():
 	score_changed.connect(_on_score_changed)
+	wave_started.connect(_on_wave_started)
+	wave_completed.connect(_on_wave_completed)
 
 func start_game():
 	print("Avviando il gioco")
 	game_active = true
 	current_score = 0
+	current_wave = 1
+	enemies_killed_this_wave = 0
+	
 	score_changed.emit(current_score)
 	
 	await get_tree().process_frame
@@ -76,31 +106,54 @@ func start_game():
 		return
 	
 	print("Player trovato: ", player.name)
-	
-	# Validazione più robusta del timer
-	if spawn_timer and is_instance_valid(spawn_timer):
-		if spawn_timer.is_stopped():
-			spawn_timer.start()
-			print("Timer di spawn avviato")
-		else:
-			print("Timer già attivo")
-	else:
-		print("ERRORE: Timer di spawn non valido!")
-		_setup_spawn_timer()  # Ricrea il timer
-		if spawn_timer:
-			spawn_timer.start()
+	_start_wave(current_wave)
 
 func stop_game():
 	print("Fermando il gioco")
 	game_active = false
+	wave_active = false
 	if spawn_timer:
 		spawn_timer.stop()
+	if wave_timer:
+		wave_timer.stop()
+
+func _start_wave(wave_number: int):
+	print("Iniziando ondata ", wave_number)
+	current_wave = wave_number
+	wave_active = true
+	enemies_spawned_this_wave = 0
+	enemies_killed_this_wave = 0
+	
+	# Calcola quanti nemici per questa ondata
+	enemies_in_current_wave = base_enemies_per_wave + (enemies_increase_per_wave * (wave_number - 1))
+	enemies_in_current_wave = min(enemies_in_current_wave, max_concurrent_enemies)
+	
+	# Calcola intervallo di spawn per questa ondata
+	var current_spawn_interval = spawn_interval_base - (spawn_interval_reduction * (wave_number - 1))
+	current_spawn_interval = max(current_spawn_interval, 0.2)  # Minimo 0.2 secondi
+	
+	spawn_timer.wait_time = current_spawn_interval
+	spawn_timer.start()
+	
+	wave_started.emit(wave_number)
+	print("Ondata ", wave_number, " - Nemici: ", enemies_in_current_wave, " - Intervallo: ", current_spawn_interval)
 
 func _spawn_enemy():
-	if not game_active:
-		print("Game non attivo, saltando spawn")
+	if not game_active or not wave_active:
 		return
 		
+	# Controlla se abbiamo spawnato tutti i nemici dell'ondata
+	if enemies_spawned_this_wave >= enemies_in_current_wave:
+		spawn_timer.stop()
+		print("Tutti i nemici dell'ondata ", current_wave, " sono stati spawnati")
+		return
+	
+	# Controlla il limite di nemici contemporanei per performance
+	var current_enemies = get_tree().get_nodes_in_group("enemies")
+	if current_enemies.size() >= max_concurrent_enemies:
+		print("Limite nemici contemporanei raggiunto, aspettando...")
+		return
+	
 	if not is_instance_valid(player):
 		player = get_tree().get_first_node_in_group("player")
 		if not player:
@@ -123,13 +176,53 @@ func _spawn_enemy():
 		
 	enemy.global_position = spawn_position
 	
+	# Connetti il segnale di morte del nemico
+	if enemy.has_signal("enemy_died"):
+		enemy.enemy_died.connect(_on_enemy_died)
+	
 	var scene_root = get_tree().current_scene
 	if scene_root:
 		scene_root.call_deferred("add_child", enemy)
-		print("Nemico spawnato in posizione: ", spawn_position)
+		enemies_spawned_this_wave += 1
+		print("Nemico ", enemies_spawned_this_wave, "/", enemies_in_current_wave, " spawnato nell'ondata ", current_wave)
 	else:
 		print("ERRORE: Scena corrente non trovata per spawn")
 		enemy.queue_free()
+
+func _on_enemy_died():
+	enemies_killed_this_wave += 1
+	print("Nemico ucciso: ", enemies_killed_this_wave, "/", enemies_in_current_wave)
+	
+	# Controlla se l'ondata è completata
+	if enemies_killed_this_wave >= enemies_in_current_wave:
+		_complete_wave()
+
+func _complete_wave():
+	print("Ondata ", current_wave, " completata!")
+	wave_active = false
+	spawn_timer.stop()
+	
+	# Bonus punteggio per completamento ondata
+	add_score(wave_completion_bonus)
+	
+	wave_completed.emit(current_wave)
+	
+	# Prepara la prossima ondata
+	_prepare_next_wave()
+
+func _prepare_next_wave():
+	print("Preparando ondata ", current_wave + 1)
+	
+	# Avvia il timer per la prossima ondata
+	wave_timer.wait_time = wave_preparation_time
+	wave_timer.start()
+	
+	# Emetti segnale per UI
+	preparing_next_wave.emit(wave_preparation_time)
+
+func _start_next_wave():
+	current_wave += 1
+	_start_wave(current_wave)
 
 func _get_random_spawn_position() -> Vector2:
 	if not player:
@@ -146,11 +239,9 @@ func _get_random_spawn_position() -> Vector2:
 		if _is_valid_spawn_position(spawn_pos):
 			return spawn_pos
 	
-	# Fallback: spawn in una posizione minima
 	return player_pos + Vector2(min_spawn_distance, 0).rotated(randf() * 2 * PI)
 
 func _is_valid_spawn_position(pos: Vector2) -> bool:
-	# Versione semplificata per evitare problemi nell'export
 	if not player:
 		return false
 	
@@ -166,15 +257,31 @@ func add_score(points: int):
 func get_current_score() -> int:
 	return current_score
 
+func get_current_wave() -> int:
+	return current_wave
+
+func get_wave_progress() -> Dictionary:
+	return {
+		"current_wave": current_wave,
+		"enemies_killed": enemies_killed_this_wave,
+		"enemies_total": enemies_in_current_wave,
+		"wave_active": wave_active
+	}
+
 func _on_score_changed(new_score: int):
 	if score_label:
 		score_label.text = "Score: " + str(new_score)
 
+func _on_wave_started(wave_number: int):
+	if wave_label:
+		wave_label.text = "Wave: " + str(wave_number)
+
+func _on_wave_completed(wave_number: int):
+	print("UI: Ondata ", wave_number, " completata!")
+
 func on_player_died():
 	print("Player morto - fermando il gioco")
 	stop_game()
-	
-	# Emetti il segnale immediatamente
 	player_died.emit()
 	print("Segnale player_died emesso")
 
@@ -183,6 +290,11 @@ func reset_game():
 	stop_game()
 	
 	current_score = 0
+	current_wave = 1
+	enemies_killed_this_wave = 0
+	enemies_spawned_this_wave = 0
+	wave_active = false
+	
 	score_changed.emit(current_score)
 	
 	# Rimuovi tutti i nemici esistenti
@@ -207,3 +319,8 @@ func set_score_label(label: Label):
 	score_label = label
 	if score_label:
 		score_label.text = "Score: " + str(current_score)
+
+func set_wave_label(label: Label):
+	wave_label = label
+	if wave_label:
+		wave_label.text = "Wave: " + str(current_wave)
