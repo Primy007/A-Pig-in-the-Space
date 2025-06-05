@@ -1,10 +1,10 @@
 # wave_hud.gd - HUD per il sistema ondate
-extends Control
+extends CanvasLayer
 
-@onready var wave_label = $VBox/WaveLabel
-@onready var progress_label = $VBox/ProgressLabel
-@onready var preparation_label = $VBox/PreparationLabel
-@onready var progress_bar = $VBox/ProgressBar
+@onready var wave_label = $WaveHUD/VBox/WaveLabel
+@onready var progress_label = $WaveHUD/VBox/ProgressLabel
+@onready var preparation_label = $WaveHUD/VBox/PreparationLabel
+@onready var progress_bar = $WaveHUD/VBox/ProgressBar
 
 var preparation_timer: float = 0.0
 var is_preparing: bool = false

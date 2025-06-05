@@ -2,51 +2,56 @@
 
 [ext_resource type="Script" path="res://scripts/ui/wave_hud.gd" id="1_xh4xm"]
 
-[node name="WaveHUD" type="Control"]
-layout_mode = 3
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 360.0
-grow_horizontal = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+[node name="WaveHUDLayer" type="CanvasLayer"]
+layer = 100
 script = ExtResource("1_xh4xm")
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="WaveHUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 117.0
+offset_bottom = -619.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="WaveHUD"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -98.0
-offset_top = -92.5
-offset_right = 98.0
-offset_bottom = 92.5
+offset_left = -235.0
+offset_top = -77.0
+offset_right = 235.0
+offset_bottom = 77.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="WaveLabel" type="Label" parent="VBox"]
+[node name="WaveLabel" type="Label" parent="WaveHUD/VBox"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 26
 text = "Wave: 1"
 
-[node name="ProgressLabel" type="Label" parent="VBox"]
+[node name="ProgressLabel" type="Label" parent="WaveHUD/VBox"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 26
 text = "Enemies: 0/0"
 
-[node name="ProgressBar" type="ProgressBar" parent="VBox"]
-custom_minimum_size = Vector2(470, 50)
+[node name="ProgressBar" type="ProgressBar" parent="WaveHUD/VBox"]
+custom_minimum_size = Vector2(400, 25)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 21
 
-[node name="PreparationLabel" type="Label" parent="VBox"]
+[node name="PreparationLabel" type="Label" parent="WaveHUD/VBox"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 8
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 21
 text = "Next wave in: 3"
