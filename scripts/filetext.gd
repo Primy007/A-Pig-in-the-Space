@@ -38,14 +38,10 @@ func collect():
 	# Emetti il segnale con il contenuto del testo
 	file_collected.emit(text_content)
 	
-	# ✅ SOLUZIONE SEMPLICE: Usa direttamente la textbox con le funzioni corrette
-	var textbox = get_tree().get_first_node_in_group("textbox")
-	if textbox:
-		# Mostra un messaggio di sistema per il file raccolto
-		textbox.add_system_message("File raccolto: " + text_content)
-		
-		# Oppure mostra il contenuto come dialogo del narratore
-		# textbox.add_dialogue(text_content, textbox.Speaker.NARRATOR)
+	# RIMUOVI QUESTA PARTE (il DialogueManager gestirà tutto):
+	# var textbox = get_tree().get_first_node_in_group("textbox")
+	# if textbox:
+	#     textbox.add_system_message("File raccolto: " + text_content)
 	
 	# Nascondi o rimuovi l'oggetto
 	queue_free()

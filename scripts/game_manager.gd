@@ -34,6 +34,22 @@ var wave_completion_bonus: int = 500
 # --- GAME STATE ---
 var game_active: bool = false
 
+# --- FILETEXT SYSTEM ---
+@export var filetext_scene: PackedScene
+var filetext_every_waves: int = 3
+var is_waiting_for_filetext: bool = false
+var current_filetext: Node2D = null
+var filetext_texts: Array[String] = [
+	"Rapporto di missione: Settore Alpha-7 liberato da minacce ostili.",
+	"Log del capitano: I nemici stanno aumentando di numero. Mantieni alta la guardia.",
+	"Comunicazione base: Ottimo lavoro pilota! Continua così.",
+	"Analisi tattica: I nemici sembrano seguire pattern di attacco prevedibili.",
+	"Messaggio personale: La tua famiglia è orgogliosa dei tuoi successi nello spazio.",
+	"Rapporto tecnico: Sistemi di difesa della nave al 100% di efficienza.",
+	"Intel militare: Nuove minacce rilevate nei settori esterni. Preparati.",
+	"Log personale: Ogni file recuperato ci avvicina alla vittoria finale."
+]
+
 # --- REFERENCES ---
 var spawn_timer: Timer
 var wave_timer: Timer
@@ -58,6 +74,9 @@ func _ready():
 			print("Enemy scene caricata: ", enemy_scene != null)
 		else:
 			print("ERRORE: File enemy_fly.tscn non trovato in ", enemy_path)
+	
+	# AGGIUNGI QUESTA RIGA QUI:
+	_load_filetext_scene()
 	
 	_setup_timers()
 	_connect_signals()
@@ -216,8 +235,13 @@ func _complete_wave():
 	
 	wave_completed.emit(current_wave)
 	
-	# Avvia IMMEDIATAMENTE la prossima ondata (senza timer di attesa)
-	call_deferred("_start_next_wave")
+	# CONTROLLA SE SPAWARE FILETEXT (ogni 3 wave)
+	if current_wave % filetext_every_waves == 0:
+		print("Spawning FileText dopo wave ", current_wave)
+		_spawn_filetext()
+	else:
+		# Avvia immediatamente la prossima ondata
+		call_deferred("_start_next_wave")
 
 func _start_next_wave():
 	current_wave += 1
@@ -327,3 +351,89 @@ func set_wave_label(label: Label):
 	wave_label = label
 	if wave_label:
 		wave_label.text = "Wave: " + str(current_wave)
+
+func _load_filetext_scene():
+	if not filetext_scene:
+		var filetext_path = "res://scenes/filetext.tscn"
+		if ResourceLoader.exists(filetext_path):
+			filetext_scene = load(filetext_path)
+			print("FileText scene caricata: ", filetext_scene != null)
+		else:
+			print("ERRORE: File filetext.tscn non trovato in ", filetext_path)
+
+func _spawn_filetext():
+	"""Spawna un FileText lontano dal player"""
+	if not filetext_scene or not player:
+		print("ERRORE: FileText scene o player non disponibili")
+		call_deferred("_start_next_wave")
+		return
+	
+	is_waiting_for_filetext = true
+	
+	# Posizione spawn lontana dal player
+	var spawn_pos = _get_filetext_spawn_position()
+	
+	# Crea il FileText
+	current_filetext = filetext_scene.instantiate()
+	current_filetext.global_position = spawn_pos
+	
+	# Imposta il testo casuale
+	var random_text = filetext_texts[randi() % filetext_texts.size()]
+	current_filetext.set_text_content(random_text)
+	
+	# Connetti il segnale
+	current_filetext.file_collected.connect(_on_filetext_collected)
+	
+	# Aggiungi alla scena
+	var scene_root = get_tree().current_scene
+	if scene_root:
+		scene_root.add_child(current_filetext)
+		print("FileText spawnato con testo: ", random_text.substr(0, 50) + "...")
+	else:
+		print("ERRORE: Scena corrente non trovata per spawn FileText")
+		current_filetext.queue_free()
+		call_deferred("_start_next_wave")
+
+func _get_filetext_spawn_position() -> Vector2:
+	"""Calcola posizione spawn per FileText (lontano dal player)"""
+	if not player:
+		return Vector2.ZERO
+	
+	var player_pos = player.global_position
+	var distance = randf_range(2000.0, 3000.0)  # Distanza fissa lontana
+	var angle = randf() * 2 * PI
+	
+	return player_pos + Vector2(cos(angle), sin(angle)) * distance
+
+func _on_filetext_collected(content: String):
+	"""Chiamato quando il FileText viene raccolto"""
+	print("FileText raccolto: ", content.substr(0, 50) + "...")
+	
+	# Avvia il dialogo del FileText
+	DialogueManager.start_filetext_dialogue(content)
+	
+	# Pulisci il riferimento
+	current_filetext = null
+	
+	# USA call_deferred per evitare l'errore di flushing queries
+	call_deferred("_handle_filetext_dialogue_completion")
+
+func _wait_for_dialogue_to_finish():
+	"""Attende che il dialogo del FileText finisca"""
+	while DialogueManager.is_dialogue_active():
+		await get_tree().process_frame
+	
+	print("Dialogo FileText completato, continuando con le wave")
+
+func is_game_paused_for_filetext() -> bool:
+	"""Controlla se il gioco è in pausa per un FileText"""
+	return is_waiting_for_filetext
+
+func _handle_filetext_dialogue_completion():
+	"""Gestisce il completamento del dialogo FileText in modo sicuro"""
+	# Attendi che il dialogo finisca
+	await _wait_for_dialogue_to_finish()
+	
+	# Ora può iniziare la wave successiva
+	is_waiting_for_filetext = false
+	call_deferred("_start_next_wave")

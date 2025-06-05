@@ -27,6 +27,14 @@ func _update_wave_display():
 	
 	wave_label.text = "Wave: " + str(wave_info.current_wave)
 	
+	# CONTROLLA SE SIAMO IN ATTESA DI FILETEXT
+	if GameManager.is_waiting_for_filetext:
+		progress_label.text = "Find and read the text file to continue!"
+		progress_bar.value = 0
+		progress_bar.visible = true
+		progress_label.visible = true
+		return
+	
 	if wave_info.wave_active:
 		# Conta i nemici vivi in tempo reale
 		var alive_enemies = get_tree().get_nodes_in_group("enemies").size()

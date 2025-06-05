@@ -88,6 +88,39 @@ func start_area_entered_dialogue(area_name: String):
 		
 	textbox.add_dialogue("Entrando in: " + area_name, Speaker.SYSTEM)
 
+func start_filetext_dialogue(content: String):
+	"""Dialogo speciale per i FileText raccolti ogni 3 wave"""
+	if !textbox:
+		_find_textbox()
+		
+	textbox.clear_dialogue_queue()
+	
+	# Messaggio di sistema iniziale
+	textbox.add_dialogue("File di testo trovato!", Speaker.SYSTEM)
+	
+	# Il contenuto del file come narrazione
+	textbox.add_dialogue(content, Speaker.NARRATOR)
+	
+	# Messaggio del capitano
+	var captain_responses = [
+		"Informazioni preziose, pilota!",
+		"Ottimo lavoro nel recuperare questi dati!",
+		"Ogni informazione conta per la missione!",
+		"Continua così, sei sulla strada giusta!"
+	]
+	
+	textbox.add_dialogue(captain_responses[randi() % captain_responses.size()], Speaker.CAPTAIN)
+	
+	# Risposta del player
+	var player_responses = [
+		"Capito, capitano!",
+		"Sempre ai suoi ordini!",
+		"Pronto per la prossima sfida!",
+		"Missione compresa!"
+	]
+	
+	textbox.add_dialogue(player_responses[randi() % player_responses.size()], Speaker.PLAYER)
+
 # DIALOGHI PREDEFINITI DA DATI
 
 func load_dialogue_from_data(dialogue_id: String):
