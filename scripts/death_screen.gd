@@ -1,116 +1,122 @@
-# death_screen.gd - VERSIONE CORRETTA
+# death_screen.gd - SOLUZIONE SEMPLIFICATA E FUNZIONANTE
 extends CanvasLayer
 
 # --- REFERENCES ---
 @onready var score_label = $Control/VBoxContainer/ScoreLabel
 @onready var restart_button = $Control/VBoxContainer/ButtonContainer/RestartButton
 @onready var quit_button = $Control/VBoxContainer/ButtonContainer/QuitButton
-@onready var background = $Control/Background
-@onready var control_container = $Control
 
 var game_manager: Node
 
 func _ready():
-	# Inizialmente nascosta
+	print("DeathScreen _ready() chiamato")
+	
+	# Configurazione iniziale
 	visible = false
-	
-	# Assicurati che il CanvasLayer sia sopra tutto
 	layer = 100
-	
-	# IMPORTANTE: Imposta il process mode per funzionare anche in pausa
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Imposta anche tutti i nodi figli per funzionare in pausa
-	_set_children_process_mode_always(self)
-	
-	# Connetti i bottoni
-	if restart_button:
-		restart_button.pressed.connect(_on_restart_pressed)
-	if quit_button:
-		quit_button.pressed.connect(_on_quit_pressed)
-	
-	# Trova il GameManager (dovrebbe essere un autoload)
-	call_deferred("_setup_game_manager")
+	# Setup immediato
+	_setup_everything()
 
-func _set_children_process_mode_always(node: Node):
-	"""Imposta ricorsivamente il process mode di tutti i figli"""
-	node.process_mode = Node.PROCESS_MODE_ALWAYS
-	for child in node.get_children():
-		_set_children_process_mode_always(child)
-
-func _setup_game_manager():
+func _setup_everything():
+	print("Setup completo death screen...")
+	
+	# Trova GameManager
 	game_manager = get_node("/root/GameManager") if has_node("/root/GameManager") else null
-	
 	if game_manager:
-		# Connetti al segnale di morte del player
 		if not game_manager.player_died.is_connected(show_death_screen):
 			game_manager.player_died.connect(show_death_screen)
-		print("Death screen connesso al GameManager")
-	else:
-		print("ERRORE: GameManager non trovato come autoload!")
+		print("GameManager connesso")
+	
+	# Setup pulsanti con connessione diretta
+	if restart_button:
+		# Assicurati che funzioni in pausa
+		restart_button.process_mode = Node.PROCESS_MODE_ALWAYS
+		
+		# Connetti il segnale se non già connesso
+		if not restart_button.pressed.is_connected(_on_restart_pressed):
+			restart_button.pressed.connect(_on_restart_pressed)
+		print("RestartButton configurato")
+	
+	if quit_button:
+		# Assicurati che funzioni in pausa
+		quit_button.process_mode = Node.PROCESS_MODE_ALWAYS
+		
+		# Connetti il segnale se non già connesso
+		if not quit_button.pressed.is_connected(_on_quit_pressed):
+			quit_button.pressed.connect(_on_quit_pressed)
+		print("QuitButton configurato")
 
 func show_death_screen():
-	print("Mostrando schermata di morte")
+	print("=== MOSTRANDO DEATH SCREEN ===")
 	
-	# Mostra il punteggio finale
+	# Imposta punteggio
 	var final_score = game_manager.get_current_score() if game_manager else 0
 	if score_label:
 		score_label.text = "Final Score: " + str(final_score)
 	
-	# Mostra la schermata
+	# Rendi visibile
 	visible = true
 	
 	# Pausa il gioco
 	get_tree().paused = true
 	
-	# Assicurati che i bottoni siano focusabili
+	# Focus sul pulsante restart
 	if restart_button:
 		restart_button.grab_focus()
 	
-	print("Schermata di morte mostrata, gioco in pausa")
-
-func hide_death_screen():
-	print("Nascondendo schermata di morte")
-	visible = false
-	get_tree().paused = false
+	print("Death screen mostrata e gioco in pausa")
 
 func _on_restart_pressed():
-	print("Restart premuto")
+	print("=== RESTART PRESSED ===")
+	_restart_game()
+
+func _on_quit_pressed():
+	print("=== QUIT PRESSED ===")
+	_quit_game()
+
+func _restart_game():
+	print("Restarting game...")
 	
-	# Prima togli la pausa
+	# Prima cosa: togli la pausa
 	get_tree().paused = false
 	
-	# Nascondi la schermata
+	# Nascondi schermata
 	visible = false
 	
-	# Reset del GameManager
+	# Reset game manager
 	if game_manager:
 		game_manager.reset_game()
 	
-	# Ricarica la scena principale
+	# Ricarica scena
 	get_tree().reload_current_scene()
 
-func _on_quit_pressed():
-	print("Quit premuto")
+func _quit_game():
+	print("Quitting game...")
 	
-	# Prima togli la pausa
+	# Togli pausa
 	get_tree().paused = false
 	
-	# Chiudi il gioco
+	# Chiudi gioco
 	get_tree().quit()
 
-# Gestisce l'input per evitare che i controlli del gioco funzionino quando la schermata è attiva
-func _input(event):
-	if visible and event is InputEvent:
-		# Blocca gli input quando la schermata è visibile
-		get_viewport().set_input_as_handled()
-
-# Input per test
+# Input handler semplificato per tastiera
 func _unhandled_input(event):
 	if not visible:
 		return
-		
+	
 	if event.is_action_pressed("ui_accept"):
-		_on_restart_pressed()
+		print("Enter premuto")
+		_restart_game()
 	elif event.is_action_pressed("ui_cancel"):
-		_on_quit_pressed()
+		print("Esc premuto") 
+		_quit_game()
+	elif event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_R:
+				print("R premuto")
+				_restart_game()
+			KEY_Q:
+				print("Q premuto")
+				_quit_game()
