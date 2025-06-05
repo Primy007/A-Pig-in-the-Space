@@ -55,6 +55,6 @@ theme_override_font_sizes/font_size = 21
 [node name="PreparationLabel" type="Label" parent="WaveHUD/VBox"]
 visible = false
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 21
 text = "Next wave in: 3"

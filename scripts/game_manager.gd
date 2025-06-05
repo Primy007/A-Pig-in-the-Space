@@ -7,8 +7,8 @@ func _init():
 
 # --- SPAWN SETTINGS ---
 @export var enemy_scene: PackedScene
-@export var min_spawn_distance: float = 1200.0  # Aumentato per spawn più lontano
-@export var max_spawn_distance: float = 2000.0  # Molto più lontano
+@export var min_spawn_distance: float = 2500.0  # Molto più lontano
+@export var max_spawn_distance: float = 3500.0  # Estremamente lontano
 @export var spawn_margin: float = 200.0
 
 # --- WAVE SYSTEM BILANCIATO ---
@@ -218,16 +218,6 @@ func _complete_wave():
 	
 	# Avvia IMMEDIATAMENTE la prossima ondata (senza timer di attesa)
 	call_deferred("_start_next_wave")
-
-func _prepare_next_wave():
-	print("Preparando ondata ", current_wave + 1)
-	
-	# Avvia il timer per la prossima ondata
-	wave_timer.wait_time = wave_preparation_time
-	wave_timer.start()
-	
-	# Emetti segnale per UI
-	preparing_next_wave.emit(wave_preparation_time)
 
 func _start_next_wave():
 	current_wave += 1

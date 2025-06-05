@@ -1,4 +1,4 @@
-# wave_hud.gd - HUD SEMPLIFICATO per ondate immediate
+# wave_hud.gd - HUD SEMPLIFICATO per ondate immediate con progress bar corretta
 extends CanvasLayer
 
 @onready var wave_label = $WaveHUD/VBox/WaveLabel
@@ -35,9 +35,10 @@ func _update_wave_display():
 		
 		progress_label.text = "Enemies alive: " + str(alive_enemies) + "/" + str(total) + " (Spawned: " + str(spawned) + ")"
 		
-		# Barra di progresso basata su nemici rimanenti
+		# Barra di progresso basata su nemici eliminati (non rimanenti)
 		if total > 0:
-			progress_bar.value = float(total - alive_enemies) / float(total) * 100
+			var enemies_killed = total - alive_enemies
+			progress_bar.value = float(enemies_killed) / float(total) * 100
 		else:
 			progress_bar.value = 0
 		
@@ -49,6 +50,8 @@ func _update_wave_display():
 
 func _on_wave_started(wave_number: int):
 	print("HUD: Ondata ", wave_number, " iniziata")
+	# RESET PROGRESS BAR a 0 quando inizia una nuova ondata
+	progress_bar.value = 0
 	_update_wave_display()
 
 func _on_wave_completed(wave_number: int):
