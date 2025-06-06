@@ -13,7 +13,7 @@ dest_files=["res://.godot/imported/synth_beep_01.ogg-33e289adebee62b48234784e2b5
 [params]
 
 loop=false
-loop_offset=0
-bpm=0
+loop_offset=0.0
+bpm=0.0
 beat_count=0
 bar_beats=4

@@ -31,6 +31,10 @@ var current_score: int = 0
 var points_per_enemy: int = 100
 var wave_completion_bonus: int = 500
 
+# --- HEALTH ITEM STATISTICS (OPZIONALE) ---
+var health_items_collected: int = 0
+var total_health_restored: int = 0
+
 # --- GAME STATE ---
 var game_active: bool = false
 
@@ -322,25 +326,34 @@ func reset_game():
 	enemies_spawned_this_wave = 0
 	wave_active = false
 	
+	# AGGIUNGI QUESTE RIGHE:
+	health_items_collected = 0
+	total_health_restored = 0
+	
 	score_changed.emit(current_score)
 	
-	# Rimuovi tutti i nemici esistenti
+	# Resto della funzione rimane uguale...
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	for enemy in enemies:
 		if is_instance_valid(enemy):
 			enemy.queue_free()
 	
-	# Rimuovi tutti i proiettili
 	var bullets = get_tree().get_nodes_in_group("bullets")
 	for bullet in bullets:
 		if is_instance_valid(bullet):
 			bullet.queue_free()
 	
-	# Rimuovi tutti i power-up
 	var powerups = get_tree().get_nodes_in_group("powerups")
 	for powerup in powerups:
 		if is_instance_valid(powerup):
 			powerup.queue_free()
+	
+	# AGGIUNGI QUESTA PULIZIA:
+	# Rimuovi tutti gli health item
+	var health_items = get_tree().get_nodes_in_group("health_items")
+	for item in health_items:
+		if is_instance_valid(item):
+			item.queue_free()
 
 func set_score_label(label: Label):
 	score_label = label
@@ -437,3 +450,22 @@ func _handle_filetext_dialogue_completion():
 	# Ora può iniziare la wave successiva
 	is_waiting_for_filetext = false
 	call_deferred("_start_next_wave")
+
+func _on_health_item_collected(healing_amount: int):
+	"""Chiamata quando un health item viene raccolto"""
+	if not game_active:
+		return
+		
+	health_items_collected += 1
+	total_health_restored += healing_amount
+	
+	print("Health Item #", health_items_collected, " raccolto - Curato: ", healing_amount, " HP")
+	
+	# Opzionale: Aggiungi un piccolo bonus al punteggio
+	add_score(25)  # Piccolo bonus per aver raccolto un health item
+
+func get_health_items_collected() -> int:
+	return health_items_collected
+
+func get_total_health_restored() -> int:
+	return total_health_restored

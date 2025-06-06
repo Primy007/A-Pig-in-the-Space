@@ -18,6 +18,10 @@ signal enemy_died
 @export var max_health = 100
 @export var current_health = 100
 
+# Configurazione per health item drop
+@export var health_drop_chance: float = 0.15  # 15% chance di drop (più basso dei power-up)
+@export var health_item_scene: PackedScene   # Scena dell'health item da droppare
+
 # Configurazione per power-up drop
 @export var powerup_drop_chance: float = 0.3
 @export var powerup_scenes: Array[PackedScene] = []
@@ -120,7 +124,9 @@ func _handle_dead():
 	if GameManager:
 		GameManager.add_score(GameManager.points_per_enemy)
 	
-	call_deferred("_try_drop_powerup")
+	# SISTEMA DI DROP OTTIMIZZATO - prima health item, poi power-up
+	call_deferred("_try_drop_items")
+	
 	$DeathSFX.play()
 	animation_flying.play("Explosion")
 	await animation_flying.animation_finished
@@ -138,3 +144,55 @@ func update_health_bar():
 
 func die():
 	queue_free()
+
+func _try_drop_items():
+	"""Sistema di drop ottimizzato per health item e power-up"""
+	var drop_position = global_position
+	var scene_root = get_tree().current_scene
+	
+	if not scene_root:
+		print("ERRORE: Scena corrente non trovata per il drop")
+		return
+	
+	# 1. TENTATIVO DROP HEALTH ITEM (priorità più alta se player ha poca salute)
+	var should_drop_health = _should_drop_health_item()
+	
+	if should_drop_health and health_item_scene:
+		var health_item = health_item_scene.instantiate()
+		health_item.global_position = drop_position
+		scene_root.add_child(health_item)
+		print("Health Item droppato!")
+		return  # Se droppa health item, non droppa power-up
+	
+	# 2. TENTATIVO DROP POWER-UP (solo se non ha droppato health item)
+	_try_drop_powerup()
+
+func _should_drop_health_item() -> bool:
+	"""Determina se droppare un health item basandosi sulla salute del player"""
+	# Controlla se esiste la scena dell'health item
+	if not health_item_scene:
+		return false
+	
+	# Trova il player
+	var player = get_tree().get_first_node_in_group("player")
+	if not is_instance_valid(player):
+		return false
+	
+	# Calcola la percentuale di salute del player
+	var health_percentage = float(player.current_health) / float(player.max_health)
+	
+	# Aumenta la probabilità di drop se il player ha poca salute
+	var adjusted_chance = health_drop_chance
+	
+	if health_percentage <= 0.3:      # Salute molto bassa (≤30%)
+		adjusted_chance *= 3.0        # Tripla la probabilità
+	elif health_percentage <= 0.5:   # Salute bassa (≤50%)
+		adjusted_chance *= 2.0        # Raddoppia la probabilità
+	elif health_percentage <= 0.7:   # Salute media (≤70%)
+		adjusted_chance *= 1.5        # Aumenta del 50%
+	
+	# Se il player ha salute piena, non droppare health item
+	if health_percentage >= 1.0:
+		return false
+	
+	return randf() <= adjusted_chance
