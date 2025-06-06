@@ -4,6 +4,7 @@ extends Node
 func _ready():
 	print("Main scene ready")
 	call_deferred("_setup_scene")
+	$AudioStreamPlayer.play()
 
 func _setup_scene():
 	_setup_managers()

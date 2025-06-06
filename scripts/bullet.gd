@@ -9,12 +9,16 @@ var penetration_count = 0  # Numero di nemici attraversati
 var max_penetration = 1  # Massimo numero di penetrazioni (default: nessuna penetrazione aggiuntiva)
 
 @onready var anim_explosion = $Bullet_animation
+@onready var sound_shoot = $SoundShoot  # Riferimento al nodo AudioStreamPlayer2D
 
 func _ready():
 	# Ruota lo sprite nella direzione del movimento
 	rotation = direction.angle() + PI/2  # Aggiusta in base all'orientamento iniziale
 	$Bullet_animation.visible = false
-
+	
+	# Riproduci il suono di sparo quando il proiettile viene creato
+	if sound_shoot:
+		sound_shoot.play()
 
 func _physics_process(delta):
 	position += direction * speed * delta
@@ -39,7 +43,6 @@ func _on_body_entered(body):
 		if penetration_count >= max_penetration:
 			_explode_and_free_if_enemies()
 		# Altrimenti, continua il suo percorso
-
 
 func _explode_and_free_if_enemies():
 	speed = 0

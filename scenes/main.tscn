@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bvuge3ghg5v4"]
+[gd_scene load_steps=8 format=3 uid="uid://bvuge3ghg5v4"]
 
 [ext_resource type="PackedScene" uid="uid://peodo11jl1nh" path="res://scenes/asteroid.tscn" id="1_15ar3"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_ftjo1"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bwgq04d5523lr" path="res://assets/images/background/EmptyStarfield.jpg" id="3_12b7q"]
 [ext_resource type="PackedScene" uid="uid://v3hdef2mwb1l" path="res://scenes/player.tscn" id="5_ul1qq"]
 [ext_resource type="PackedScene" uid="uid://decgqip5dj2nh" path="res://scenes/hud/textbox.tscn" id="6_l54ps"]
+[ext_resource type="AudioStream" uid="uid://m0p20jq2g0yc" path="res://assets/audio/music/Koi-discovery - Electroscope.mp3" id="7_5d2mk"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ftjo1")
@@ -27,3 +28,8 @@ texture = ExtResource("3_12b7q")
 position = Vector2(800, 481)
 
 [node name="Textbox" parent="." instance=ExtResource("6_l54ps")]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_5d2mk")
+volume_db = -7.0
+bus = &"Music"

@@ -387,7 +387,7 @@ func _spawn_filetext():
 	# Aggiungi alla scena
 	var scene_root = get_tree().current_scene
 	if scene_root:
-		scene_root.add_child(current_filetext)
+		scene_root.call_deferred("add_child", current_filetext)  # ✅ USA call_deferred
 		print("FileText spawnato con testo: ", random_text.substr(0, 50) + "...")
 	else:
 		print("ERRORE: Scena corrente non trovata per spawn FileText")
