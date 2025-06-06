@@ -44,14 +44,14 @@ var filetext_every_waves: int = 3
 var is_waiting_for_filetext: bool = false
 var current_filetext: Node2D = null
 var filetext_texts: Array[String] = [
-	"Rapporto di missione: Settore Alpha-7 liberato da minacce ostili.",
-	"Log del capitano: I nemici stanno aumentando di numero. Mantieni alta la guardia.",
-	"Comunicazione base: Ottimo lavoro pilota! Continua così.",
-	"Analisi tattica: I nemici sembrano seguire pattern di attacco prevedibili.",
-	"Messaggio personale: La tua famiglia è orgogliosa dei tuoi successi nello spazio.",
-	"Rapporto tecnico: Sistemi di difesa della nave al 100% di efficienza.",
-	"Intel militare: Nuove minacce rilevate nei settori esterni. Preparati.",
-	"Log personale: Ogni file recuperato ci avvicina alla vittoria finale."
+	"Mission Report: Sector Alpha-7 cleared of hostile threats.",
+	"Captain's Log: Enemy numbers are increasing. Stay alert.",
+	"Base Communication: Great job, pilot! Keep it up.",
+	"Tactical Analysis: Enemies follow predictable attack patterns.",
+	"Personal Message: Your family is proud of your space feats.",
+	"Technical Report: Ship's defense systems at 100% efficiency.",
+	"Military Intel: New threats detected in the outer sectors.",
+	"Personal Log: Each file we recover brings final victory."
 ]
 
 # --- REFERENCES ---
